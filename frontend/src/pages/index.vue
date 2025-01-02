@@ -1,72 +1,129 @@
 <template>
   <v-container class="mt-4">
     <v-card>
-      <v-card-title>Enter Job Details</v-card-title>
+      <v-card-title>
+        Enter Job Details
+        <v-spacer />
+        <v-switch
+          v-model="isAdvancedForm"
+          label="Advanced Form"
+        />
+      </v-card-title>
       <v-card-text>
-        <!-- Job Title -->
-        <v-text-field
-          v-model="jobTitle"
-          label="Job Title"
-          placeholder="Enter the job title"
-          outlined
-          dense
-        />
+        <template v-if="!isAdvancedForm">
+          <v-text-field
+            v-model="jobTitle"
+            label="Job Title"
+            placeholder="Enter the job title"
+            outlined
+            dense
+          />
+          <v-select
+            v-model="selectedCategory"
+            label="Job Category"
+            :items="filteredCategories"
+            multiple
+            chips
+            outlined
+            dense
+            clearable
+            :menu-props="{ contentClass: 'category-menu' }"
+          >
+            <template #prepend-item>
+              <v-text-field
+                v-model="categorySearch"
+                label="Search Category"
+                dense
+                outlined
+                clearable
+              />
+            </template>
+          </v-select>
+          <v-textarea
+            v-model="jobDescription"
+            label="Job Description"
+            placeholder="Enter a detailed description of the job"
+            outlined
+            rows="4"
+            dense
+          />
+        </template>
 
-        <!-- Category -->
-        <v-select
-          v-model="selectedCategory"
-          label="Job Category"
-          :items="filteredCategories"
-          multiple
-          chips
-          outlined
-          dense
-          clearable
-          :menu-props="{ contentClass: 'category-menu' }"
-        >
-          <template #prepend-item>
-            <v-text-field
-              v-model="categorySearch"
-              label="Search Category"
-              dense
-              outlined
-              clearable
-            />
-          </template>
-        </v-select>
-
-        <!-- Subcategory -->
-        <v-select
-          v-if="selectedCategory.length"
-          v-model="selectedSubcategories"
-          label="Job Subcategory"
-          :items="filteredSubcategories"
-          multiple
-          chips
-          outlined
-          dense
-          clearable
-        >
-          <template #prepend-item>
-            <v-text-field
-              v-model="subcategorySearch"
-              label="Search Subcategory"
-              dense
-              outlined
-              clearable
-            />
-          </template>
-        </v-select>
-
-        <!-- Description -->
-        <v-textarea
-          v-model="jobDescription"
-          label="Job Description"
-          placeholder="Enter a detailed description of the job"
-          outlined
-          rows="4"
-          dense
-        />
+        <template v-else>
+          <v-text-field
+            v-model="jobTitle"
+            label="Job Title"
+            placeholder="Enter the job title"
+            outlined
+            dense
+          />
+          <v-select
+            v-model="selectedCategory"
+            label="Job Category"
+            :items="filteredCategories"
+            multiple
+            chips
+            outlined
+            dense
+            clearable
+            :menu-props="{ contentClass: 'category-menu' }"
+          >
+            <template #prepend-item>
+              <v-text-field
+                v-model="categorySearch"
+                label="Search Category"
+                dense
+                outlined
+                clearable
+              />
+            </template>
+          </v-select>
+          <v-select
+            v-if="selectedCategory.length"
+            v-model="selectedSubcategories"
+            label="Job Subcategory"
+            :items="filteredSubcategories"
+            multiple
+            chips
+            outlined
+            dense
+            clearable
+          >
+            <template #prepend-item>
+              <v-text-field
+                v-model="subcategorySearch"
+                label="Search Subcategory"
+                dense
+                outlined
+                clearable
+              />
+            </template>
+          </v-select>
+          <v-textarea
+            v-model="jobDescription"
+            label="Job Description"
+            placeholder="Enter a detailed description of the job"
+            outlined
+            rows="4"
+            dense
+          />
+          <v-file-input
+            v-model="uploadedImages"
+            label="Upload Images"
+            accept="image/*"
+            outlined
+            dense
+            multiple
+          />
+          <v-text-field
+            v-model="budget"
+            label="Budget ($)"
+            placeholder="Enter the budget"
+            outlined
+            dense
+            type="number"
+          />
+        </template>
       </v-card-text>
       <v-card-actions>
         <v-btn
@@ -77,17 +134,100 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+
+    <v-container class="mt-4">
+      <div v-for="(job, index) in myJobs" :key="index" class="mb-4">
+        <v-card>
+          <v-card-title>
+            {{ job.title }}
+          </v-card-title>
+          <v-card-subtitle>
+            Category: {{ job.categories.join(', ') }}
+          </v-card-subtitle>
+          <v-card-actions>
+            <v-btn color="primary" @click="viewJobDetails(job)">
+              View Details
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </div>
+
+      <v-dialog v-model="isJobDialogOpen" max-width="600px">
+        <v-card>
+          <v-card-title>
+            Job Details
+            <v-spacer/>
+            <v-btn icon @click="isJobDialogOpen = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <div><strong>Title:</strong> {{ selectedJob?.title }}</div>
+            <div><strong>Description:</strong> {{ selectedJob?.description }}</div>
+            <div><strong>Category:</strong> {{ selectedJob?.categories.join(', ') }}</div>
+            <div><strong>Subcategories:</strong> {{ selectedJob?.subcategories.join(', ') }}</div>
+            <div><strong>Budget:</strong> ${{ selectedJob?.budget }}</div>
+            <div v-if="selectedJob?.images && selectedJob.images.length">
+              <strong>Images:</strong>
+              <v-chip-group>
+                <v-chip
+                  v-for="(image, index) in selectedJob.images"
+                  :key="index"
+                  class="ma-1"
+                >
+                  <v-icon left>mdi-file-image</v-icon>
+                  {{ image.name }}
+                </v-chip>
+              </v-chip-group>
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" @click="isJobDialogOpen = false">
+              Close
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-container>
   </v-container>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 
-// Data
+const isJobDialogOpen = ref(false);
+const selectedJob = ref<any>(null);
+const myJobs = ref([
+  {
+    title: 'Website Development',
+    description: 'Build a responsive website for an e-commerce platform.',
+    categories: ['IT Services'],
+    subcategories: ['Web Development'],
+    budget: 5000,
+    images: [{ name: 'design-mockup.png' }],
+  },
+  {
+    title: 'Apartment Painting',
+    description: 'Paint a 3-room apartment with premium quality paint.',
+    categories: ['Construction Work'],
+    subcategories: ['Painting'],
+    budget: 800,
+    images: [],
+  },
+]);
+
+const viewJobDetails = (job: any) => {
+  selectedJob.value = job;
+  isJobDialogOpen.value = true;
+};
+
+const isAdvancedForm = ref(false);
 const jobTitle = ref('');
 const jobDescription = ref('');
 const selectedCategory = ref<string[]>([]);
 const selectedSubcategories = ref<string[]>([]);
+const uploadedImages = ref<File[]>([]);
+const budget = ref<number | null>(null);
 const categories = ref<string[]>(['IT Services', 'Construction Work', 'Cleaning', 'Creative Work']);
 const subcategories = ref<Record<string, string[]>>({
   'IT Services': ['Web Development', 'Mobile Applications', 'Server Management'],
@@ -124,9 +264,11 @@ const submitJob = () => {
     title: jobTitle.value,
     description: jobDescription.value,
     categories: selectedCategory.value,
-    subcategories: selectedSubcategories.value
+    subcategories: selectedSubcategories.value,
+    images: uploadedImages.value,
+    budget: budget.value,
   };
-
+myJobs.value.push(jobData)
   console.log('Submitted Job:', jobData);
 };
 </script>
