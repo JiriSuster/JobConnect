@@ -195,26 +195,20 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 
+export interface Job {
+  id: number | undefined,
+  title: string
+  description: string,
+  categories: string[],
+  subcategories: string[],
+  images: File[] | undefined,
+  budget: number | undefined
+}
+
 const isJobDialogOpen = ref(false);
-const selectedJob = ref<any>(null);
-const myJobs = ref([
-  {
-    title: 'Website Development',
-    description: 'Build a responsive website for an e-commerce platform.',
-    categories: ['IT Services'],
-    subcategories: ['Web Development'],
-    budget: 5000,
-    images: [{ name: 'design-mockup.png' }],
-  },
-  {
-    title: 'Apartment Painting',
-    description: 'Paint a 3-room apartment with premium quality paint.',
-    categories: ['Construction Work'],
-    subcategories: ['Painting'],
-    budget: 800,
-    images: [],
-  },
-]);
+const selectedJob = ref<Job>();
+const myJobs = ref<Job[]>([]);
+
 
 const viewJobDetails = (job: any) => {
   selectedJob.value = job;
@@ -261,14 +255,15 @@ const filteredSubcategories = computed(() => {
 // Methods
 const submitJob = () => {
   const jobData = {
+    id: undefined,
     title: jobTitle.value,
     description: jobDescription.value,
     categories: selectedCategory.value,
     subcategories: selectedSubcategories.value,
     images: uploadedImages.value,
-    budget: budget.value,
+    budget: budget.value || undefined,
   };
-myJobs.value.push(jobData)
+  myJobs.value.push(jobData)
   console.log('Submitted Job:', jobData);
 };
 </script>
