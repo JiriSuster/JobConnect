@@ -1,0 +1,20 @@
+### POST request
+POST http://localhost:3000/jobs
+Content-Type: application/json
+
+{
+  "title": "Graphic Designer Needed",
+  "description": "We are looking for a creative graphic designer to work on our new marketing materials.",
+  "categories": [
+    "Design",
+    "Marketing"
+  ],
+  "subcategories": [
+    "Graphic Design",
+    "Branding"
+  ],
+  "budget": 500
+}
+
+### GET request
+GET http://localhost:3000/jobs
