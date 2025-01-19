@@ -1,9 +1,10 @@
 export interface Job {
-    id: number | undefined,
-    title: string
+    customerEmail: string | undefined,
+    companyEmail: string | undefined
+    title: string,
     description: string,
     categories: string[],
-    subcategories: string[],
+    subcategories: string[]| undefined,
     images: File[] | undefined,
     budget: number | undefined
 }

@@ -259,12 +259,13 @@ const jobService = useJobServiceStore()
 
 const submitJob = () => {
   const jobData = {
-    id: undefined,
+    customerEmail: auth.getUserEmail(),
+    companyEmail: undefined,
     title: jobTitle.value,
     description: jobDescription.value,
     categories: selectedCategory.value,
-    subcategories: selectedSubcategories.value,
-    images: uploadedImages.value,
+    subcategories: selectedSubcategories.value || undefined,
+    images: uploadedImages.value || undefined,
     budget: budget.value || undefined,
   };
   jobs.value.push(jobData)

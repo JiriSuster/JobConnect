@@ -29,6 +29,11 @@ server.get('/', homepageController.homepage)
 const jobController = new JobController()
 server.post('/jobs', jobController.create)
 server.get('/jobs',jobController.getAll)
+server.post('/jobs/:id', jobController.assignCompanyToJob)
+server.get('/jobs/:id', jobController.getById)
+server.put('/jobs/:id', jobController.update)
+server.delete('/jobs/:id', jobController.delete)
+
 
 
 // Middleware: Error handling

@@ -1,4 +1,3 @@
 ﻿backend/node_modules
 backend/.DS_Store
-*.env
-backend/.env.test
+frontend/node_modules

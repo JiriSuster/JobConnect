@@ -23,7 +23,7 @@ onMounted(async () => {
       <div class="wrapper">
         <HelloWorld msg="You did it!" />
 
-        <p v-if="auth.state.authenticated">Welcome, {{ auth.getUsername() }}!</p>
+        <p v-if="auth.state.authenticated">Welcome, {{ auth.getUsername() }}! {{ auth.getUserRoles()[0] }}  {{ auth.getUserEmail() }}</p>
         <button v-else @click="auth.login()">Log in</button>
 
         <nav>

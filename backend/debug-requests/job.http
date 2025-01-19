@@ -3,6 +3,7 @@ POST http://localhost:3000/jobs
 Content-Type: application/json
 
 {
+  "customerEmail": "customer@jobsapp.com",
   "title": "Graphic Designer Needed",
   "description": "We are looking for a creative graphic designer to work on our new marketing materials.",
   "categories": [
@@ -16,5 +17,34 @@ Content-Type: application/json
   "budget": 500
 }
 
-### GET request
+### GET request (all)
 GET http://localhost:3000/jobs
+
+### GET request with id
+GET http://localhost:3000/jobs/678ccb961dbab51bee6f726f
+
+###PUT request with id
+PUT http://localhost:3000/jobs/678d24b6805ed6211b7ed5f8
+Content-Type: application/json
+
+{
+  "customerEmail": "customer@jobsapp.com",
+  "companyEmail": "company@jobsapp.com",
+  "title": "Updated Job Title",
+  "description": "Updated description for the job.",
+  "categories": [
+    "Updated Category"
+  ],
+  "subcategories": [
+    "Updated Subcategory"
+  ],
+  "budget": 1000
+}
+
+###DELETE request with id
+DELETE http://localhost:3000/jobs/678ccb961dbab51bee6f726f
+
+
+
+
+

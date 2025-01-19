@@ -18,7 +18,6 @@ let authConfig: client.Configuration;
 export function useAuth() {
 
     const init = async () => {
-        /*
         const issuerUri = `${config.keycloak.baseUrl}/realms/${config.keycloak.realm}`;
         authConfig = await client.discovery(
             new URL(issuerUri),
@@ -26,10 +25,11 @@ export function useAuth() {
             undefined,
             undefined,
             { execute: [client.allowInsecureRequests] } // allow running Keycloak on localhost
-        );*/
+        );
     }
 
     const login = async () => {
+        console.log("login");
         /**
          * PKCE: The following MUST be generated for every redirect to the
          * authorization_endpoint. You must store the code_verifier and state in the
@@ -108,6 +108,10 @@ export function useAuth() {
         return state.user?.['resource_access']?.[config.keycloak.clientId]?.roles ?? []
     }
 
+    const getUserEmail = () => {
+        return state.user?.['email']
+    }
+
     return {
         state,
         error,
@@ -116,6 +120,8 @@ export function useAuth() {
         handleCallback,
         authorizedRequest,
         unauthorizedRequest,
-        getUsername
+        getUsername,
+        getUserRoles,
+        getUserEmail
     };
 }

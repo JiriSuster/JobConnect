@@ -1,6 +1,24 @@
-import { IsNotEmpty, Length, IsArray, IsOptional, IsNumber, IsPositive, ArrayMinSize } from 'class-validator';
+import {
+    IsNotEmpty,
+    Length,
+    IsArray,
+    IsOptional,
+    IsNumber,
+    IsPositive,
+    ArrayMinSize,
+    IsEmail
+} from 'class-validator';
 
 export class JobDto {
+
+    @IsNotEmpty()
+    @IsEmail()
+    customerEmail: string;
+
+    @IsOptional()
+    @IsEmail()
+    companyEmail: string;
+
     @IsNotEmpty()
     @Length(3, 50)
     title: string;
@@ -26,3 +44,5 @@ export class JobDto {
     @IsPositive()
     budget: number;
 }
+
+
