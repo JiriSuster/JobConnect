@@ -44,7 +44,13 @@ Content-Type: application/json
 ###DELETE request with id
 DELETE http://localhost:3000/jobs/678ccb961dbab51bee6f726f
 
+###POST request with id
+POST http://localhost:3000/jobs/678d26fe805ed6211b7ed5fe
+Content-Type: application/json
 
+{
+  "companyEmail": "company1@jobsapp.com"
+}
 
 
 

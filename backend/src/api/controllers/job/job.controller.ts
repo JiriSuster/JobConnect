@@ -4,6 +4,7 @@ import {Request, Response} from 'express';
 import {validateBody, validateParams} from "../../../middleware/validation.middleware";
 import {jobsService} from "../../../business/jobs.service";
 import {IdParam} from "../../../types/base.dto";
+import {JobAssignDto} from "./jobAssign.dto";
 
 export class JobController {
 
@@ -52,8 +53,9 @@ export class JobController {
 
     async assignCompanyToJob(req: Request, res: Response) {
         const { id } = await validateParams(req, IdParam)
-        await jobsService.assignCompany(id,"example@example.com")
-        res.status(204).send()
+        const dto = await validateBody(req, JobAssignDto)
+        const job = await jobsService.assignCompany(id,dto)
+        res.status(200).send(job)
     }
 
 

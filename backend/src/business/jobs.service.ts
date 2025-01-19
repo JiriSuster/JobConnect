@@ -1,5 +1,6 @@
 import {JobDto} from "../api/controllers/job/job.dto";
 import {Job} from "../persistence/models/job.model";
+import {JobAssignDto} from "../api/controllers/job/jobAssign.dto";
 
 export const jobsService = {
     async create(data: JobDto) {
@@ -24,9 +25,9 @@ export const jobsService = {
         return Job.findByIdAndDelete(id);
     },
 
-    async assignCompany(jobId: string, companyEmail: string) {
+    async assignCompany(jobId: string, data: JobAssignDto) {
         const job = await Job.findById(jobId);
-        job.companyEmail = companyEmail;
+        job.companyEmail = data.companyEmail;
         await job.save();
         return job;
     }
