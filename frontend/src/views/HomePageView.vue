@@ -277,7 +277,7 @@ const jobs = ref<Array<Job>>([])
 const auth = useAuth()
 
 async function fetchData() {
-  const response = await auth.unauthorizedRequest(config.backendUrl + "/jobs", "GET")
+  const response = await auth.authorizedRequest(config.backendUrl + "/jobs", "GET")
   jobs.value = response
 }
 </script>

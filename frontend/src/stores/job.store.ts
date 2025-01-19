@@ -13,7 +13,7 @@ export const useJobServiceStore = defineStore('job', () => {
 
 
     function getJobsRequest(){
-        return auth.unauthorizedRequest(config.backendUrl + "/jobs","GET")
+        return auth.authorizedRequest(config.backendUrl + "/jobs","GET")
     }
 
 
@@ -27,7 +27,7 @@ export const useJobServiceStore = defineStore('job', () => {
     }
 
     async function postJob(job: Job) {
-        return auth.unauthorizedRequest(config.backendUrl + "/jobs","POST", {data: job})
+        return auth.authorizedRequest(config.backendUrl + "/jobs","POST", {data: job})
     }
 
     return {getJobs,isLoading, postJob}

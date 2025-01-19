@@ -27,12 +27,12 @@ server.get('/', homepageController.homepage)
 
 //Job
 const jobController = new JobController()
-server.post('/jobs', jobController.create)
-server.get('/jobs',jobController.getAll)
-server.post('/jobs/:id', jobController.assignCompanyToJob)
-server.get('/jobs/:id', jobController.getById)
-server.put('/jobs/:id', jobController.update)
-server.delete('/jobs/:id', jobController.delete)
+server.post('/jobs',[auth.authenticate(), hasAnyRole("CUSTOMER")], jobController.create)
+server.get('/jobs',[auth.authenticate(), hasAnyRole("COMPANY")],jobController.getAll)
+server.post('/jobs/:id',[auth.authenticate(),hasAnyRole("COMPANY")], jobController.assignCompanyToJob)
+server.get('/jobs/:id',[auth.authenticate(),hasAnyRole("COMPANY","CUSTOMER")], jobController.getById)
+server.put('/jobs/:id',[auth.authenticate(),hasAnyRole("CUSTOMER")], jobController.update)
+server.delete('/jobs/:id',[auth.authenticate(),hasAnyRole("CUSTOMER")], jobController.delete)
 
 
 

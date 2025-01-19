@@ -3,7 +3,7 @@
 # --- Authorization Code Grant ---
 
 # 1. Redirect user to login page (open in browser, not here headless)
-# http://localhost:8091/realms/JOBS-APPS/protocol/openid-connect/auth?response_type=code&client_id=web-app&redirect_uri=http://localhost:5173/login-callback
+# http://localhost:8091/realms/JOBS-APP/protocol/openid-connect/auth?response_type=code&client_id=web-app&redirect_uri=http://localhost:5173/login-callback
 
 # 2. User logs in by providing username and password directly to Keycloak
 
@@ -16,4 +16,4 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=authorization_code &
 client_id=web-app &
 redirect_uri=http://localhost:5173/login-callback &
-code=ef5fcaab-df74-4c55-9a63-778cd1c1d8af.297e2183-3935-418b-a03f-c8be39f0f37a.8b2c3836-ba16-4e25-836f-bbb377d608cb
+code=4013583c-3505-454d-8a4b-019e71581606.bbbf8c68-2ffb-4e02-ab7b-96dd6d2fed91.d09cf184-5319-45a9-aa7b-f85d651a51a4
