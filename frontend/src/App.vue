@@ -29,7 +29,8 @@ onMounted(async () => {
 
         <nav>
           <RouterLink to="/">Home</RouterLink>
-          <RouterLink to="/about">About</RouterLink>
+          <RouterLink to="/myjobs">My jobs</RouterLink>
+          <RouterLink v-if="auth.getUserRoles()[0] == 'COMPANY'" to="/alljobs">All jobs</RouterLink>
         </nav>
       </div>
     </header>

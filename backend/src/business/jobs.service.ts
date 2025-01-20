@@ -30,6 +30,13 @@ export const jobsService = {
         job.companyEmail = data.companyEmail;
         await job.save();
         return job;
+    },
+
+    async getJobByCustomer(customerEmail: string) {
+        return Job.find({"customerEmail" : customerEmail})
+    },
+    async getJobByCompany(companyEmail: string) {
+        return Job.find({"companyEmail" : companyEmail})
     }
 
 }

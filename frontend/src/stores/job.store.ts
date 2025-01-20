@@ -17,7 +17,7 @@ export const useJobServiceStore = defineStore('job', () => {
     }
 
 
-    async function getJobs() : Promise<[Job]> {
+    async function getAllJobs(){
         isLoading.value = true
         return getJobsRequest().then(value => {
             const JobsData = value.data;
@@ -30,7 +30,7 @@ export const useJobServiceStore = defineStore('job', () => {
         return auth.authorizedRequest(config.backendUrl + "/jobs","POST", {data: job})
     }
 
-    return {getJobs,isLoading, postJob}
+    return {getAllJobs,isLoading, postJob}
 
 })
 

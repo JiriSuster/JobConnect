@@ -104,7 +104,7 @@ export function useAuth() {
         const refreshToken = state.refreshToken;
         if (!refreshToken) {
             console.error("No refresh token available.");
-            //logout();
+            cleanLocalStorage()
             return undefined;
         }
 
@@ -135,12 +135,17 @@ export function useAuth() {
             return newAccessToken;
         } catch (err) {
             console.error("Failed to refresh token:", err);
-            logout();
+            cleanLocalStorage()
             return undefined;
         }
     };
 
     const logout = () => {
+        cleanLocalStorage()
+        window.location.href = `${config.keycloak.baseUrl}/realms/${config.keycloak.realm}/protocol/openid-connect/logout?redirect_uri=${encodeURIComponent(location.origin)}`;
+    };
+
+    const cleanLocalStorage = () => {
         state.authenticated = false;
         state.accessToken = undefined;
         state.refreshToken = undefined;
@@ -149,11 +154,8 @@ export function useAuth() {
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         localStorage.removeItem('state');
-        localStorage.removeItem('code_verifier');
-        console.log(location.origin)
-        window.location.href = `${config.keycloak.baseUrl}/realms/${config.keycloak.realm}/protocol/openid-connect/logout?redirect_uri=${encodeURIComponent(location.origin)}`;
-    };
-
+        localStorage.removeItem('code_verifier')
+    }
     const unauthorizedRequest = async (endpoint: string, method: string, options = {}) => {
         const response = await axios({
             url: `${endpoint}`,

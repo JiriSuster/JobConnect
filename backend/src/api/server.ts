@@ -27,7 +27,9 @@ server.get('/', homepageController.homepage)
 
 //Job
 const jobController = new JobController()
-server.post('/jobs',[auth.authenticate(),loggingService.log(), hasAnyRole("CUSTOMER")], jobController.create)
+server.get('/jobs/company',[auth.authenticate(), hasAnyRole("COMPANY")],jobController.getByCompany)
+server.get('/jobs/customer',[auth.authenticate(), hasAnyRole("CUSTOMER")],jobController.getByCustomer)
+server.post('/jobs',[auth.authenticate(), hasAnyRole("CUSTOMER")], jobController.create)
 server.get('/jobs',[auth.authenticate(), hasAnyRole("COMPANY")],jobController.getAll)
 server.post('/jobs/:id',[auth.authenticate(),hasAnyRole("COMPANY")], jobController.assignCompanyToJob)
 server.get('/jobs/:id',[auth.authenticate(),hasAnyRole("COMPANY","CUSTOMER")], jobController.getById)

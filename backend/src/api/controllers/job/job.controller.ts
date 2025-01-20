@@ -58,6 +58,18 @@ export class JobController {
         res.status(200).send(job)
     }
 
+    async getByCustomer(req: Request, res: Response) {
+        const email = res.locals.oauth?.token?.user.email
+        const jobs = await jobsService.getJobByCustomer(email)
+        res.status(200).send(jobs)
+    }
+
+    async getByCompany(req: Request, res: Response) {
+        const email = res.locals.oauth?.token?.user.email
+        const jobs = await jobsService.getJobByCompany(email)
+        res.status(200).send(jobs)
+    }
+
 
 
 
