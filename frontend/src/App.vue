@@ -24,6 +24,7 @@ onMounted(async () => {
         <HelloWorld msg="You did it!" />
 
         <p v-if="auth.state.authenticated">Welcome, {{ auth.getUsername() }}! {{ auth.getUserRoles()[0] }}  {{ auth.getUserEmail() }}</p>
+        <button v-if="auth.state.authenticated" @click="auth.logout()">Log out</button>
         <button v-else @click="auth.login()">Log in</button>
 
         <nav>

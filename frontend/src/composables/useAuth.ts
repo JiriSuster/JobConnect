@@ -7,11 +7,12 @@ import config from "@/config";
 
 // State for auth
 const state = reactive({
-    accessToken: null,
-    user: null,
-    authenticated: false,
+    accessToken: localStorage.getItem('access_token') || undefined,
+    refreshToken: localStorage.getItem('refresh_token') || undefined,
+    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : undefined,
+    authenticated: !!localStorage.getItem('access_token')
 });
-const error = ref<string | null>(null);
+const error = ref<string | undefined>(undefined);
 let codeChallenge: string;
 let authConfig: client.Configuration;
 
@@ -67,13 +68,22 @@ export function useAuth() {
 
         state.authenticated = true;
         state.accessToken = tokens.access_token;
+        state.refreshToken = tokens.refresh_token;
         state.user = jwtDecode(tokens.access_token);
+
+        localStorage.setItem('access_token', tokens.access_token);
+        localStorage.setItem('refresh_token', tokens.refresh_token);
+        localStorage.setItem('user', JSON.stringify(state.user));
+
+
     };
+
 
     /**
      * Make an authenticated request to the backend
      */
     const authorizedRequest = async (endpoint: string, method: string, options = {}) => {
+        await refreshToken()
         if (!state.accessToken) {
             error.value = 'Not authenticated';
             throw new Error(error.value);
@@ -88,6 +98,60 @@ export function useAuth() {
             ...options,
         });
         return response.data;
+    };
+
+    const refreshToken = async () => {
+        const refreshToken = state.refreshToken;
+        if (!refreshToken) {
+            console.error("No refresh token available.");
+            //logout();
+            return undefined;
+        }
+
+        try {
+            const response = await axios.post(
+                `${config.keycloak.baseUrl}/realms/${config.keycloak.realm}/protocol/openid-connect/token`,
+                new URLSearchParams({
+                    client_id: config.keycloak.clientId!,
+                    grant_type: 'refresh_token',
+                    refresh_token: refreshToken,
+                }),
+                {
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                }
+        );
+
+            const newAccessToken = response.data.access_token;
+            const newRefreshToken = response.data.refresh_token;
+            
+            state.accessToken = newAccessToken;
+            state.refreshToken = newRefreshToken;
+            state.user = jwtDecode(newAccessToken);
+
+            localStorage.setItem('access_token', newAccessToken);
+            localStorage.setItem('refresh_token', newRefreshToken);
+            localStorage.setItem('user', JSON.stringify(state.user));
+
+            return newAccessToken;
+        } catch (err) {
+            console.error("Failed to refresh token:", err);
+            logout();
+            return undefined;
+        }
+    };
+
+    const logout = () => {
+        state.authenticated = false;
+        state.accessToken = undefined;
+        state.refreshToken = undefined;
+        state.user = undefined;
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('state');
+        localStorage.removeItem('code_verifier');
+        console.log(location.origin)
+        window.location.href = `${config.keycloak.baseUrl}/realms/${config.keycloak.realm}/protocol/openid-connect/logout?redirect_uri=${encodeURIComponent(location.origin)}`;
     };
 
     const unauthorizedRequest = async (endpoint: string, method: string, options = {}) => {
@@ -122,6 +186,7 @@ export function useAuth() {
         unauthorizedRequest,
         getUsername,
         getUserRoles,
-        getUserEmail
+        getUserEmail,
+        logout
     };
 }
