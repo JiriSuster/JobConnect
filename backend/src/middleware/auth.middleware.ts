@@ -42,7 +42,7 @@ export const oAuthModel = {
             algorithms: ['RS256'], // Keycloak uses RS256
             issuer: `${Config.keycloak.issuerUrl}/realms/${Config.keycloak.realm}`, // Ensure token is issued by this realm
         }
-        const decodedToken = await jwtVerify(accessToken, getKey, options);
+        const decodedToken : any = await jwtVerify(accessToken, getKey, options);
         return {
             accessToken,
             client: { id: Config.keycloak.clientId },
