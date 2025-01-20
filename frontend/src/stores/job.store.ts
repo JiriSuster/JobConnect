@@ -1,36 +1,28 @@
-import {defineStore} from "pinia";
-import {ref} from "vue";
-import {useAuth} from "@/composables/useAuth";
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { useAuth } from "@/composables/useAuth";
 import config from "@/config";
-import type {Job} from "@/model/Job";
-
-
-
+import type { Job } from "@/model/Job";
 
 export const useJobServiceStore = defineStore('job', () => {
-    const isLoading = ref(true)
-    const auth = useAuth()
+    const isLoading = ref(true);
+    const auth = useAuth();
+    const baseUrl = `${config.backendUrl}/jobs`;
 
-
-    function getJobsRequest(){
-        return auth.authorizedRequest(config.backendUrl + "/jobs","GET")
+    // Fetch all jobs
+    async function getAllJobs() {
+        return auth.authorizedRequest(`${baseUrl}/`, "GET");
     }
 
-
-    async function getAllJobs(){
-        isLoading.value = true
-        return getJobsRequest().then(value => {
-            const JobsData = value.data;
-            isLoading.value = false
-            return JobsData;
-        });
-    }
-
+    // Post a new job
     async function postJob(job: Job) {
-        return auth.authorizedRequest(config.backendUrl + "/jobs","POST", {data: job})
+        return auth.authorizedRequest(`${baseUrl}/`, "POST", { data: job });
     }
 
-    return {getAllJobs,isLoading, postJob}
+    // Fetch jobs based on a specific role
+    async function getMyJobs(role: string) {
+        return auth.authorizedRequest(`${baseUrl}/${role.toLowerCase()}`, "GET");
+    }
 
-})
-
+    return { isLoading, getAllJobs, postJob, getMyJobs };
+});

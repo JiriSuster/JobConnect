@@ -123,7 +123,7 @@
               outlined
               dense
               type="number"
-              @input="budget = $event.target.value ? Number($event.target.value) : null"
+              @input="budget = $event.target.value ? Number($event.target.value) : undefined"
           /> <!-- @input for converting to number -->
         </template>
       </v-card-text>
@@ -151,9 +151,9 @@ const isAdvancedForm = ref(false);
 const jobTitle = ref('');
 const jobDescription = ref('');
 const selectedCategory = ref<string[]>([]);
-const selectedSubcategories = ref<string[]>([]);
-const uploadedImages = ref<File[]>([]);
-const budget = ref<number | null>(null);
+const selectedSubcategories = ref<string[] | undefined>(undefined);
+const uploadedImages = ref<File[] | undefined>(undefined);
+const budget = ref<number | undefined>(undefined);
 const categories = ref<string[]>(['IT Services', 'Construction Work', 'Cleaning', 'Creative Work']);
 const subcategories = ref<Record<string, string[]>>({
   'IT Services': ['Web Development', 'Mobile Applications', 'Server Management'],

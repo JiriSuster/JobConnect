@@ -4,13 +4,17 @@ import * as client from 'openid-client';
 import {jwtDecode} from "jwt-decode";
 import config from "@/config";
 
-
+const localStorageUtil = {
+    get: (key: string) => localStorage.getItem(key) || 'null',
+    set: (key : string, value : string) => localStorage.setItem(key, value),
+    remove: (key: string) => localStorage.removeItem(key),
+};
 // State for auth
 const state = reactive({
-    accessToken: localStorage.getItem('access_token') || undefined,
-    refreshToken: localStorage.getItem('refresh_token') || undefined,
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : undefined,
-    authenticated: !!localStorage.getItem('access_token')
+    accessToken: localStorageUtil.get('access_token') || undefined,
+    refreshToken: localStorageUtil.get('refresh_token') || undefined,
+    user: localStorageUtil.get('user') ? JSON.parse(localStorageUtil.get('user')) : undefined,
+    authenticated: !!localStorageUtil.get('access_token')
 });
 const error = ref<string | undefined>(undefined);
 let codeChallenge: string;
@@ -37,8 +41,8 @@ export function useAuth() {
          * end-user session such that it can be recovered as the user gets redirected
          * from the authorization server back to your application.
          */
-        localStorage.setItem('code_verifier', client.randomPKCECodeVerifier())
-        codeChallenge = await client.calculatePKCECodeChallenge(localStorage.getItem('code_verifier'))
+        localStorageUtil.set('code_verifier', client.randomPKCECodeVerifier())
+        codeChallenge = await client.calculatePKCECodeChallenge(localStorageUtil.get('code_verifier'))
 
         let parameters: Record<string, string> = {
             redirect_uri: config.keycloak.redirectUri,
@@ -46,8 +50,8 @@ export function useAuth() {
             code_challenge_method: 'S256',
         }
 
-        localStorage.setItem('state', client.randomState())
-        parameters.state = localStorage.getItem('state')
+        localStorageUtil.set('state', client.randomState())
+        parameters.state = localStorageUtil.get('state')
 
         let redirectTo: URL = client.buildAuthorizationUrl(authConfig, parameters)
         window.location.href = redirectTo.href; // Redirect to Keycloak login page
@@ -61,8 +65,8 @@ export function useAuth() {
             authConfig,
             new URL(callbackUrl),
             {
-                pkceCodeVerifier: localStorage.getItem('code_verifier'),
-                expectedState: localStorage.getItem('state'),
+                pkceCodeVerifier: localStorageUtil.get('code_verifier'),
+                expectedState: localStorageUtil.get('state'),
             },
         )
 
@@ -71,9 +75,9 @@ export function useAuth() {
         state.refreshToken = tokens.refresh_token;
         state.user = jwtDecode(tokens.access_token);
 
-        localStorage.setItem('access_token', tokens.access_token);
-        localStorage.setItem('refresh_token', tokens.refresh_token);
-        localStorage.setItem('user', JSON.stringify(state.user));
+        localStorageUtil.set('access_token', tokens.access_token);
+        localStorageUtil.set('refresh_token', tokens.refresh_token ?? "");
+        localStorageUtil.set('user', JSON.stringify(state.user));
 
 
     };
@@ -128,9 +132,9 @@ export function useAuth() {
             state.refreshToken = newRefreshToken;
             state.user = jwtDecode(newAccessToken);
 
-            localStorage.setItem('access_token', newAccessToken);
-            localStorage.setItem('refresh_token', newRefreshToken);
-            localStorage.setItem('user', JSON.stringify(state.user));
+            localStorageUtil.set('access_token', newAccessToken);
+            localStorageUtil.set('refresh_token', newRefreshToken);
+            localStorageUtil.set('user', JSON.stringify(state.user));
 
             return newAccessToken;
         } catch (err) {
@@ -150,11 +154,11 @@ export function useAuth() {
         state.accessToken = undefined;
         state.refreshToken = undefined;
         state.user = undefined;
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('state');
-        localStorage.removeItem('code_verifier')
+        localStorageUtil.remove('access_token');
+        localStorageUtil.remove('refresh_token');
+        localStorageUtil.remove('user');
+        localStorageUtil.remove('state');
+        localStorageUtil.remove('code_verifier')
     }
     const unauthorizedRequest = async (endpoint: string, method: string, options = {}) => {
         const response = await axios({
