@@ -4,6 +4,7 @@ import express = require('express');
 import cors = require('cors');
 import {hasAnyRole, oAuthModel} from "../middleware/auth.middleware";
 import {JobController} from "./controllers/job/job.controller";
+import {loggingService} from "../middleware/logging.middleware";
 const ExpresOAuthServer = require('@node-oauth/express-oauth-server');
 
 export const server = express()
@@ -21,18 +22,18 @@ const auth = new ExpresOAuthServer({ model: oAuthModel });
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }))
 
-
 // Homepage
 server.get('/', homepageController.homepage)
 
 //Job
 const jobController = new JobController()
-server.post('/jobs',[auth.authenticate(), hasAnyRole("CUSTOMER")], jobController.create)
+server.post('/jobs',[auth.authenticate(),loggingService.log(), hasAnyRole("CUSTOMER")], jobController.create)
 server.get('/jobs',[auth.authenticate(), hasAnyRole("COMPANY")],jobController.getAll)
 server.post('/jobs/:id',[auth.authenticate(),hasAnyRole("COMPANY")], jobController.assignCompanyToJob)
 server.get('/jobs/:id',[auth.authenticate(),hasAnyRole("COMPANY","CUSTOMER")], jobController.getById)
 server.put('/jobs/:id',[auth.authenticate(),hasAnyRole("CUSTOMER")], jobController.update)
 server.delete('/jobs/:id',[auth.authenticate(),hasAnyRole("CUSTOMER")], jobController.delete)
+
 
 
 
