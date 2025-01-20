@@ -1,3 +1,4 @@
 ﻿backend/node_modules
 backend/.DS_Store
 frontend/node_modules
+backend/src/middleware/logs

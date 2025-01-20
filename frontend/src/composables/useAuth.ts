@@ -5,7 +5,7 @@ import {jwtDecode} from "jwt-decode";
 import config from "@/config";
 
 const localStorageUtil = {
-    get: (key: string) => localStorage.getItem(key) || 'null',
+    get: (key: string) => localStorage.getItem(key),
     set: (key : string, value : string) => localStorage.setItem(key, value),
     remove: (key: string) => localStorage.removeItem(key),
 };
@@ -13,7 +13,7 @@ const localStorageUtil = {
 const state = reactive({
     accessToken: localStorageUtil.get('access_token') || undefined,
     refreshToken: localStorageUtil.get('refresh_token') || undefined,
-    user: localStorageUtil.get('user') ? JSON.parse(localStorageUtil.get('user')) : undefined,
+    user: localStorageUtil.get('user') ? JSON.parse(<string>localStorageUtil.get('user')) : undefined,
     authenticated: !!localStorageUtil.get('access_token')
 });
 const error = ref<string | undefined>(undefined);
@@ -42,7 +42,7 @@ export function useAuth() {
          * from the authorization server back to your application.
          */
         localStorageUtil.set('code_verifier', client.randomPKCECodeVerifier())
-        codeChallenge = await client.calculatePKCECodeChallenge(localStorageUtil.get('code_verifier'))
+        codeChallenge = await client.calculatePKCECodeChallenge(<string>localStorageUtil.get('code_verifier'))
 
         let parameters: Record<string, string> = {
             redirect_uri: config.keycloak.redirectUri,
@@ -51,7 +51,7 @@ export function useAuth() {
         }
 
         localStorageUtil.set('state', client.randomState())
-        parameters.state = localStorageUtil.get('state')
+        parameters.state = <string>localStorageUtil.get('state')
 
         let redirectTo: URL = client.buildAuthorizationUrl(authConfig, parameters)
         window.location.href = redirectTo.href; // Redirect to Keycloak login page
@@ -65,8 +65,8 @@ export function useAuth() {
             authConfig,
             new URL(callbackUrl),
             {
-                pkceCodeVerifier: localStorageUtil.get('code_verifier'),
-                expectedState: localStorageUtil.get('state'),
+                pkceCodeVerifier: <string>localStorageUtil.get('code_verifier'),
+                expectedState: <string>localStorageUtil.get('state'),
             },
         )
 
