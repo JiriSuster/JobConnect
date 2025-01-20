@@ -184,7 +184,6 @@ const filteredSubcategories = computed(() => {
   );
 });
 
-// Methods
 
 const jobService = useJobServiceStore()
 

@@ -1,6 +1,5 @@
 import {JobDto} from "../api/controllers/job/job.dto";
 import {Job} from "../persistence/models/job.model";
-import {JobAssignDto} from "../api/controllers/job/jobAssign.dto";
 
 export const jobsService = {
     async create(data: JobDto) {
@@ -25,11 +24,27 @@ export const jobsService = {
         return Job.findByIdAndDelete(id);
     },
 
-    async assignCompany(jobId: string, data: JobAssignDto) {
+    async assignCompany(jobId: string, email: string) {
         const job = await Job.findById(jobId);
-        job.companyEmail = data.companyEmail;
-        await job.save();
-        return job;
+        if(job.companyEmail == undefined || job.companyEmail == "" || job.companyEmail == email) {
+            job.companyEmail = email;
+            await job.save();
+            return job;
+        } else {
+            throw new Error(`Company email is already assigned to ${job.companyEmail}`);
+        }
+    },
+
+    async unassignCompany(jobId: string, email: string) {
+        const job = await Job.findById(jobId);
+        if(job.companyEmail == email){
+            job.companyEmail = undefined;
+            await job.save();
+            return job;
+        }
+        else {
+            throw new Error(`The provided email: ${email} does not match the company's assigned email: ${job.companyEmail}`);
+        }
     },
 
     async getJobByCustomer(customerEmail: string) {

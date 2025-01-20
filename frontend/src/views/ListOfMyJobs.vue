@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import type {Job} from "@/model/Job";
-import {useAuth} from "@/composables/useAuth";
-import config from "@/config";
+import { onMounted, ref } from "vue";
+import type { Job } from "@/model/Job";
+import { useAuth } from "@/composables/useAuth";
 import JobList from "@/components/JobList.vue";
-import {useJobServiceStore} from "@/stores/job.store";
+import { useJobServiceStore } from "@/stores/job.store";
 
-const jobs = ref<Array<Job>>([])
-const auth = useAuth()
+const jobs = ref<Array<Job>>([]);
+const auth = useAuth();
 
 onMounted(async () => {
-  await fetchJobs()
-})
+  await fetchJobs();
+});
 
-const store = useJobServiceStore()
+const store = useJobServiceStore();
 async function fetchJobs() {
   const response = await store.getMyJobs(auth.getUserRoles()[0].toLowerCase());
-  jobs.value = response
+  jobs.value = response;
 }
+
+const showUnassign = auth.getUserRoles()[0] === "COMPANY";
 </script>
 
 <template>
-  <JobList :jobs="jobs" />
+  <JobList :jobs="jobs" :can-beun-assigned="showUnassign" @refetch-jobs="fetchJobs" />
 </template>
 
 <style scoped>
-
 </style>

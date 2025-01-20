@@ -21,11 +21,9 @@
         <v-card-title>
           Job Details
           <v-spacer/>
-          <v-btn icon @click="isJobDialogOpen = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
         </v-card-title>
         <v-card-text>
+          <div v-if="selectedJob?._id"><strong>ID:</strong> {{ selectedJob?._id }}</div>
           <div v-if="selectedJob?.title"><strong>Title:</strong> {{ selectedJob?.title }}</div>
           <div v-if="selectedJob?.customerEmail"><strong>Customer email:</strong> {{ selectedJob?.customerEmail }}</div>
           <div v-if="selectedJob?.companyEmail"><strong>Assigned company email:</strong> {{ selectedJob?.companyEmail }}</div>
@@ -46,6 +44,12 @@
               </v-chip>
             </v-chip-group>
           </div>
+          <v-btn v-if="canBeAssigned" @click="assignJob(selectedJob?._id ?? '')">
+            ASSIGN
+          </v-btn>
+          <v-btn v-if="canBeunAssigned" @click="unassignJob(selectedJob?._id ?? '')">
+            UNASSIGN
+          </v-btn>
         </v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="isJobDialogOpen = false">
@@ -60,19 +64,50 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { Job } from "@/model/Job";
+import { useAuth } from "@/composables/useAuth";
+import config from "@/config";
 
 const props = defineProps({
   jobs: {
     type: Array as () => Array<Job>,
     required: true,
   },
+  canBeAssigned: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  canBeunAssigned: {
+    type: Boolean,
+    required: false,
+    default: false,
+  }
 });
+
+const emit = defineEmits(["refetch-jobs"]);
 
 const isJobDialogOpen = ref(false);
 const selectedJob = ref<Job | null>(null);
+const auth = useAuth();
 
 const viewJobDetails = (job: Job) => {
   selectedJob.value = job;
   isJobDialogOpen.value = true;
+};
+
+const assignJob = (id: string) => {
+  if (id.length == 24) {
+    auth.authorizedRequest(`${config.backendUrl}/jobs/assign/${id}`, "PUT");
+    emit("refetch-jobs");
+    isJobDialogOpen.value = false;
+  }
+};
+
+const unassignJob = (id: string) => {
+  if (id.length == 24) {
+    auth.authorizedRequest(`${config.backendUrl}/jobs/unassign/${id}`, "PUT");
+    emit("refetch-jobs");
+    isJobDialogOpen.value = false;
+  }
 };
 </script>

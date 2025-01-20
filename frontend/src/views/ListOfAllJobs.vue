@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import type {Job} from "@/model/Job";
-import {useAuth} from "@/composables/useAuth";
-import config from "@/config";
 import JobList from "@/components/JobList.vue";
 import {useJobServiceStore} from "@/stores/job.store";
 
 const jobs = ref<Array<Job>>([])
-const auth = useAuth()
 
 onMounted(async () => {
   await fetchJobs()
@@ -21,7 +18,7 @@ async function fetchJobs() {
 </script>
 
 <template>
-  <JobList :jobs="jobs" />
+  <JobList :jobs="jobs" :can-be-assigned="true" />
 </template>
 
 <style scoped>
