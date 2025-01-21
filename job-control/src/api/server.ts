@@ -36,7 +36,7 @@ const jobController = new JobController();
 server.get('/jobs/company', [hasAnyRole("COMPANY")], jobController.getByCompany);
 server.get('/jobs/customer', [hasAnyRole("CUSTOMER")], jobController.getByCustomer);
 server.post('/jobs', [hasAnyRole("CUSTOMER")], jobController.create);
-server.get('/jobs', [hasAnyRole("COMPANY")], jobController.getAll);
+server.get('/jobs', [hasAnyRole("COMPANY")], jobController.getAllWaiting);
 server.put('/jobs/assign/:id', [hasAnyRole("COMPANY")], jobController.assignCompanyToJob);
 server.put('/jobs/unassign/:id', [hasAnyRole("COMPANY")], jobController.unassignCompanyFromJob);
 server.get('/jobs/:id', [hasAnyRole("COMPANY", "CUSTOMER")], jobController.getById);

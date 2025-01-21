@@ -10,6 +10,8 @@ import {
 } from 'class-validator';
 
 export class JobDto {
+    @IsNotEmpty()
+    state: string;
 
     @IsNotEmpty()
     @IsEmail()

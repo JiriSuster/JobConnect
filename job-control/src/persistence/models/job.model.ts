@@ -2,6 +2,7 @@
 import * as mongoose from "mongoose";
 
 export const Job = mongoose.model('Job', new mongoose.Schema({
+    state: { type: String, required: true },
     title: { type: String, required: true },
     customerEmail:{ type: String, required: true },
     companyEmail: { type: String, required: false },

@@ -18,7 +18,7 @@ async function fetchJobs() {
 </script>
 
 <template>
-  <JobList :jobs="jobs" :can-be-assigned="true" />
+  <JobList :jobs="jobs" :can-be-assigned="true" @refetch-jobs="fetchJobs()" />
 </template>
 
 <style scoped>

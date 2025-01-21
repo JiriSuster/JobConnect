@@ -12,6 +12,11 @@ export class JobController {
         res.status(200).send(jobs)
     }
 
+    async getAllWaiting(req: Request, res: Response) {
+        const jobs = await jobsService.getWaiting()
+        res.status(200).send(jobs)
+    }
+
     async create(req: Request, res: Response) {
         const dto = await validateBody(req, JobDto)
         const job = await jobsService.create(dto)

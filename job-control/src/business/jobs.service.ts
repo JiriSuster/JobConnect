@@ -12,6 +12,10 @@ export const jobsService = {
         return Job.find();
     },
 
+    async getWaiting() {
+        return Job.find({"state" : "waiting"});
+    },
+
     async getById(id: string) {
         return Job.findById(id);
     },
@@ -28,6 +32,7 @@ export const jobsService = {
         const job = await Job.findById(jobId);
         if(job.companyEmail == undefined || job.companyEmail == "" || job.companyEmail == email) {
             job.companyEmail = email;
+            job.state = "assigned"
             await job.save();
             return job;
         } else {
@@ -39,6 +44,7 @@ export const jobsService = {
         const job = await Job.findById(jobId);
         if(job.companyEmail == email){
             job.companyEmail = undefined;
+            job.state = "waiting"
             await job.save();
             return job;
         }

@@ -189,6 +189,8 @@ const jobService = useJobServiceStore()
 
 const submitJob = () => {
   const jobData = {
+    _id: undefined,
+    state: "waiting",
     customerEmail: auth.getUserEmail(),
     companyEmail: undefined,
     title: jobTitle.value,

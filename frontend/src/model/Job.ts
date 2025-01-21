@@ -1,5 +1,6 @@
 export interface Job {
     _id: string | undefined;
+    state: string | undefined;
     customerEmail: string | undefined,
     companyEmail: string | undefined
     title: string,
