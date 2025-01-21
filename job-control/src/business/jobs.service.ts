@@ -1,5 +1,6 @@
 import {JobDto} from "../api/controllers/job/job.dto";
 import {Job} from "../persistence/models/job.model";
+import {SearchDto} from "../api/controllers/job/search.dto";
 
 export const jobsService = {
     async create(data: JobDto) {
@@ -56,8 +57,36 @@ export const jobsService = {
     async getJobByCustomer(customerEmail: string) {
         return Job.find({"customerEmail" : customerEmail})
     },
+
     async getJobByCompany(companyEmail: string) {
         return Job.find({"companyEmail" : companyEmail})
+    },
+
+    async search(data: SearchDto) {
+        try {
+            if (!data.fields || data.fields.length === 0) {
+                throw new Error("No fields provided for search.");
+            }
+
+            const searchConditions = {
+                $and: [
+                    { "state": "waiting" },
+                    {
+                        $or: data.fields.map(field => ({
+                            [field]: { $regex: data.text, $options: 'i' }
+                        }))
+                    }
+                ]
+            };
+
+            const jobs = await Job.find(searchConditions);
+
+            return jobs;
+        } catch (error) {
+            console.error("Error during search:", error);
+            throw error;
+        }
     }
+
 
 }

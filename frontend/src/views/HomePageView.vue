@@ -208,6 +208,9 @@ const submitJob = () => {
   console.log('Submitted Job:', jobData);
 };
 
+
+
+
 async function fetchCategories() {
   const response = await auth.authorizedRequest(`${config.backendUrl}/categories`, "GET");
   categories.value = response.map((category: { _id: string; name: string }) => ({
@@ -221,6 +224,8 @@ async function fetchSubcategories() {
   const response = await auth.authorizedRequest(`${config.backendUrl}/categories`, "POST", {
     data: { categories: selectedCategoryIds.value },
   });
+
+
 
   subcategories.value = response.reduce((acc: Record<string, string[]>, subcategory: { _id: string; name: string; categories: string[] }) => {
     subcategory.categories.forEach((categoryId) => {

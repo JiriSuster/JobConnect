@@ -47,6 +47,7 @@ server.put('/jobs/unassign/:id', [hasAnyRole("COMPANY")], jobController.unassign
 server.get('/jobs/:id', [hasAnyRole("COMPANY", "CUSTOMER")], jobController.getById);
 server.put('/jobs/:id', [hasAnyRole("CUSTOMER")], jobController.update);
 server.delete('/jobs/:id', [hasAnyRole("CUSTOMER")], jobController.delete);
+server.post('/jobs/search', [hasAnyRole("COMPANY")], jobController.search);
 
 // Middleware: Error handling
 server.use(apiErrorHandler);

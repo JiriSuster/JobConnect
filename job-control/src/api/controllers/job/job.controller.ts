@@ -4,6 +4,7 @@ import {Request, Response} from 'express';
 import {validateBody, validateParams} from "../../../middleware/validation.middleware";
 import {jobsService} from "../../../business/jobs.service";
 import {IdParam} from "../../../types/base.dto";
+import {SearchDto} from "./search.dto";
 
 export class JobController {
 
@@ -78,6 +79,12 @@ export class JobController {
     async getByCompany(req: Request, res: Response) {
         const email = res.locals.oauth?.token?.user.email
         const jobs = await jobsService.getJobByCompany(email)
+        res.status(200).send(jobs)
+    }
+
+    async search(req: Request, res: Response){
+        const dto = await validateBody(req, SearchDto)
+        const jobs = await jobsService.search(dto)
         res.status(200).send(jobs)
     }
 
