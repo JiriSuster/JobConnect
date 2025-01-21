@@ -5,6 +5,7 @@ import cors = require('cors');
 import { hasAnyRole, oAuthModel } from "../middleware/auth.middleware";
 import { JobController } from "./controllers/job/job.controller";
 import { loggingService } from "../middleware/logging.middleware";
+import {CategoryController} from "./controllers/category/category.controller";
 const ExpresOAuthServer = require('@node-oauth/express-oauth-server');
 
 export const server = express()
@@ -33,6 +34,10 @@ server.get('/', homepageController.homepage);
 
 // Job routes
 const jobController = new JobController();
+const categoryController = new CategoryController();
+
+server.get('/categories', [hasAnyRole("CUSTOMER")], categoryController.getAll);
+server.post('/categories', [hasAnyRole("CUSTOMER")], categoryController.getSubcategories);
 server.get('/jobs/company', [hasAnyRole("COMPANY")], jobController.getByCompany);
 server.get('/jobs/customer', [hasAnyRole("CUSTOMER")], jobController.getByCustomer);
 server.post('/jobs', [hasAnyRole("CUSTOMER")], jobController.create);

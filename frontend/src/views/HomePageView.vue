@@ -141,7 +141,7 @@
 
 <script lang="ts" setup>
 
-import {ref, computed, onMounted} from 'vue';
+import {ref, computed, onMounted, watch} from 'vue';
 import config from "@/config";
 import {useAuth} from "@/composables/useAuth";
 import type {Job} from "@/model/Job";
@@ -154,29 +154,25 @@ const selectedCategory = ref<string[]>([]);
 const selectedSubcategories = ref<string[] | undefined>(undefined);
 const uploadedImages = ref<File[] | undefined>(undefined);
 const budget = ref<number | undefined>(undefined);
-const categories = ref<string[]>(['IT Services', 'Construction Work', 'Cleaning', 'Creative Work']);
-const subcategories = ref<Record<string, string[]>>({
-  'IT Services': ['Web Development', 'Mobile Applications', 'Server Management'],
-  'Construction Work': ['Renovations', 'Construction', 'Painting'],
-  'Cleaning': ['Domestic Cleaning', 'Commercial Cleaning', 'Post-renovation Cleaning'],
-  'Creative Work': ['Graphic Design', 'Drawing', 'Content Creation']
-});
+const categories = ref<{ _id: string; name: string }[]>([]);
+const subcategories = ref<Record<string, string[]>>({});
 const categorySearch = ref('');
 const subcategorySearch = ref('');
 
-// Computed
 const filteredCategories = computed(() => {
-  return categories.value.filter((category) =>
-      category.toLowerCase().includes(categorySearch.value.toLowerCase())
-  );
+  return categories.value
+      .filter((category) =>
+          category.name.toLowerCase().includes(categorySearch.value.toLowerCase())
+      )
+      .map((category) => category.name);
 });
 
 const filteredSubcategories = computed(() => {
-  const selected = selectedCategory.value;
-  if (!selected.length) return [];
+  const selectedIds = selectedCategoryIds.value;
+  if (!selectedIds.length) return [];
 
-  const allSubcategories = selected
-      .map((category) => subcategories.value[category] || [])
+  const allSubcategories = selectedIds
+      .map((id) => subcategories.value[id] || [])
       .flat();
 
   return allSubcategories.filter((subcategory) =>
@@ -184,6 +180,14 @@ const filteredSubcategories = computed(() => {
   );
 });
 
+
+const selectedCategoryIds = computed(() => {
+  return selectedCategory.value
+      .map((name) =>
+          categories.value.find((category) => category.name === name)?._id
+      )
+      .filter(Boolean) as string[];
+});
 
 const jobService = useJobServiceStore()
 
@@ -203,6 +207,44 @@ const submitJob = () => {
   jobService.postJob(jobData)
   console.log('Submitted Job:', jobData);
 };
+
+async function fetchCategories() {
+  const response = await auth.authorizedRequest(`${config.backendUrl}/categories`, "GET");
+  categories.value = response.map((category: { _id: string; name: string }) => ({
+    _id: category._id,
+    name: category.name,
+  }));
+}
+
+
+async function fetchSubcategories() {
+  const response = await auth.authorizedRequest(`${config.backendUrl}/categories`, "POST", {
+    data: { categories: selectedCategoryIds.value },
+  });
+
+  subcategories.value = response.reduce((acc: Record<string, string[]>, subcategory: { _id: string; name: string; categories: string[] }) => {
+    subcategory.categories.forEach((categoryId) => {
+      if (!acc[categoryId]) {
+        acc[categoryId] = [];
+      }
+      acc[categoryId].push(subcategory.name);
+    });
+    return acc;
+  }, {});
+}
+
+
+onMounted(()=>{
+  fetchCategories()
+})
+
+watch(selectedCategory, (newValue) => {
+  if (newValue.length) {
+    fetchSubcategories();
+  } else {
+    subcategories.value = {};
+  }
+});
 
 const auth = useAuth()
 </script>
