@@ -1,4 +1,10 @@
-﻿backend/node_modules
-backend/.DS_Store
-frontend/node_modules
-backend/src/middleware/logs
+﻿frontend/node_modules
+frontend/.idea
+job-control/node_modules
+job-control/.idea
+job-control/.DS_Store
+job-control/src/middleware/logs
+chat/node_modules
+chat/.idea
+chat/.DS_Store
+chat/src/middleware/logs

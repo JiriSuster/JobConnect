@@ -130,7 +130,10 @@ const viewJobDetails = (job: Job) => {
   isJobDialogOpen.value = true;
 
   if (selectedJob.value?._id) {
-    chatService.joinRoom(selectedJob.value._id);
+    if(props.canOpenChat) {
+      chatService.init();
+      chatService.joinRoom(selectedJob.value._id);
+    }
     chatService.onMessage((data) => {
       if(chatService.getClientId() == data.sender) {
         data.sender = "ME"
@@ -165,11 +168,6 @@ const sendMessage = () => {
   }
 };
 
-onMounted( () => {
-  if(props.canOpenChat) {
-    chatService.init();
-  }
-});
 
 onUnmounted(() => {
   if(props.canOpenChat) {

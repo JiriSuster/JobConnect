@@ -5,7 +5,7 @@ export function useChatService() {
     let socket: Socket | null = null;
 
     async function init() {
-        socket = io(Config.backendUrl);
+        socket = io(Config.chatBackend);
 
         socket.on("disconnect", () => {
             console.log("Socket.io: disconnected");
