@@ -4,6 +4,7 @@ import { useAuth } from "@/composables/useAuth";
 import config from "@/config";
 import type { Job } from "@/model/Job";
 
+
 export const useJobServiceStore = defineStore('job', () => {
     const isLoading = ref(true);
     const auth = useAuth();

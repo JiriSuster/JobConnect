@@ -22,7 +22,7 @@ const showUnassign = auth.getUserRoles()[0] === "COMPANY";
 </script>
 
 <template>
-  <JobList :jobs="jobs" :can-beun-assigned="showUnassign" @refetch-jobs="fetchJobs" />
+  <JobList :jobs="jobs" :can-beun-assigned="showUnassign" :can-open-chat="true" @refetch-jobs="fetchJobs" />
 </template>
 
 <style scoped>
