@@ -35,16 +35,7 @@ async function fetchJobs() {
 
 async function search() {
   isLoading.value = true;
-  const response = await auth.authorizedRequest(
-      `${config.backendUrl}/jobs/search`,
-      "POST",
-      {
-        data: {
-          text: searchText.value,
-          fields: selectedFields.value,
-        },
-      }
-  );
+  const response = await store.search(searchText.value,selectedFields.value);
   jobs.value = response;
   isLoading.value = false;
 }

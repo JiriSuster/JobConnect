@@ -19,6 +19,18 @@ export const useJobServiceStore = defineStore('job', () => {
     async function postJob(job: Job) {
         return auth.authorizedRequest(`${baseUrl}/`, "POST", { data: job });
     }
+    async function assignJob(id: string) {
+        return await auth.authorizedRequest(`${config.backendUrl}/jobs/assign/${id}`, "PUT");
+    }
+
+    async function unassignJob(id: string) {
+        return await auth.authorizedRequest(`${config.backendUrl}/jobs/unassign/${id}`, "PUT");
+    }
+
+    async function search(searchText: string, selectedFields: string[]) {
+        return await auth.authorizedRequest(`${config.backendUrl}/jobs/search`, "POST", {data: {text: searchText, fields: selectedFields}});
+
+    }
 
     // Post images to job
     async function postImages(jobId: string, images: FormData) {
@@ -38,6 +50,7 @@ export const useJobServiceStore = defineStore('job', () => {
         return response;
     }
 
+
     async function getImages(jobId: string){
         return await auth.authorizedRequest(`${config.imagesUrl}/image/${jobId}`, "GET");
     }
@@ -47,5 +60,5 @@ export const useJobServiceStore = defineStore('job', () => {
         return auth.authorizedRequest(`${baseUrl}/${role.toLowerCase()}`, "GET");
     }
 
-    return { isLoading, getAllJobs, postJob, getMyJobs,postImages,getImages };
+    return { isLoading, getAllJobs, postJob, getMyJobs,postImages,getImages,assignJob,unassignJob,search };
 });

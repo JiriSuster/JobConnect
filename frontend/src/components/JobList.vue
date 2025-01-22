@@ -31,17 +31,6 @@
           <div v-if="selectedJob?.subcategories"><strong>Subcategories:</strong> {{ selectedJob?.subcategories.join(', ') }}</div>
           <div v-if="selectedJob?.budget"><strong>Budget:</strong> ${{ selectedJob?.budget }}</div>
           <div v-if="selectedJob?.images && selectedJob.images.length">
-            <strong>Images:</strong>
-            <v-chip-group>
-              <v-chip
-                  v-for="(image, index) in selectedJob.images"
-                  :key="index"
-                  class="ma-1"
-              >
-                <v-icon left>mdi-file-image</v-icon>
-                {{ image.name }}
-              </v-chip>
-            </v-chip-group>
           </div>
 
           <!-- Display Images -->
@@ -55,11 +44,13 @@
                   sm="6"
                   md="4"
               >
-                <v-img
-                    :src="image"
-                    aspect-ratio="1"
-                    class="grey lighten-2"
-                ></v-img>
+                <a :href="image" target="_blank" rel="noopener noreferrer">
+                  <v-img
+                      :src="image"
+                      aspect-ratio="1"
+                      class="grey lighten-2"
+                  ></v-img>
+                </a>
               </v-col>
             </v-row>
           </div>
@@ -144,11 +135,11 @@ const chatService = useChatService();
 const images = ref<string[]>([]);
 const chatMessages = ref<{ sender: string; message: string }[]>([]);
 const currentMessage = ref("");
-const jobService = useJobServiceStore()
+const jobService = useJobServiceStore();
 const viewJobDetails = async (job: Job) => {
   selectedJob.value = job;
   if (selectedJob.value?._id) {
-    await loadImages(selectedJob.value._id);
+    loadImages(selectedJob.value._id);
   }
   isJobDialogOpen.value = true;
 
@@ -159,9 +150,9 @@ const viewJobDetails = async (job: Job) => {
     }
     chatService.onMessage((data) => {
       if (chatService.getClientId() == data.sender) {
-        data.sender = "ME"
+        data.sender = "ME";
       } else {
-        data.sender = auth.getUserRoles()[0] == "CUSTOMER" ? "COMPANY" : "CUSTOMER"
+        data.sender = auth.getUserRoles()[0] == "CUSTOMER" ? "COMPANY" : "CUSTOMER";
       }
       chatMessages.value.push(data);
     });
@@ -169,13 +160,17 @@ const viewJobDetails = async (job: Job) => {
 };
 
 const loadImages = async (id: string) => {
-  let imagesRemote = await jobService.getImages(id);
-  images.value = imagesRemote
+  try {
+    let imagesRemote = await jobService.getImages(id);
+    images.value = imagesRemote;
+  }catch(err) {
+    console.log("No images found");
+  }
 }
 
 const assignJob = (id: string) => {
   if (id.length === 24) {
-    auth.authorizedRequest(`${config.backendUrl}/jobs/assign/${id}`, "PUT");
+    jobService.assignJob(id);
     emit("refetch-jobs");
     isJobDialogOpen.value = false;
   }
@@ -183,7 +178,7 @@ const assignJob = (id: string) => {
 
 const unassignJob = (id: string) => {
   if (id.length === 24) {
-    auth.authorizedRequest(`${config.backendUrl}/jobs/unassign/${id}`, "PUT");
+    jobService.unassignJob(id);
     emit("refetch-jobs");
     isJobDialogOpen.value = false;
   }

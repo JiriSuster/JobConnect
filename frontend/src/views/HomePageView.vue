@@ -145,6 +145,7 @@ import {ref, computed, onMounted, watch} from 'vue';
 import config from "@/config";
 import {useAuth} from "@/composables/useAuth";
 import {useJobServiceStore} from "@/stores/job.store";
+import {useCategoryService} from "@/stores/category.store";
 
 const isAdvancedForm = ref(false);
 const jobTitle = ref('');
@@ -189,6 +190,7 @@ const selectedCategoryIds = computed(() => {
 });
 
 const jobService = useJobServiceStore()
+const categoryService = useCategoryService()
 
 const submitJob = async () => {
   const jobData = {
@@ -230,7 +232,7 @@ const submitJob = async () => {
 
 
 async function fetchCategories() {
-  const response = await auth.authorizedRequest(`${config.backendUrl}/categories`, "GET");
+  const response = await categoryService.getCategories();
   categories.value = response.map((category: { _id: string; name: string }) => ({
     _id: category._id,
     name: category.name,
@@ -239,9 +241,7 @@ async function fetchCategories() {
 
 
 async function fetchSubcategories() {
-  const response = await auth.authorizedRequest(`${config.backendUrl}/categories`, "POST", {
-    data: { categories: selectedCategoryIds.value },
-  });
+  const response = await categoryService.getSubcategories(selectedCategoryIds.value);
 
 
 
