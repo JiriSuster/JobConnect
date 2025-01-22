@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import { useAuth } from "@/composables/useAuth";
+import {defineStore} from "pinia";
+import {ref} from "vue";
+import {useAuth} from "@/composables/useAuth";
 import config from "@/config";
-import type { Job } from "@/model/Job";
+import type {Job} from "@/model/Job";
 
 
 export const useJobServiceStore = defineStore('job', () => {
@@ -20,10 +20,32 @@ export const useJobServiceStore = defineStore('job', () => {
         return auth.authorizedRequest(`${baseUrl}/`, "POST", { data: job });
     }
 
+    // Post images to job
+    async function postImages(jobId: string, images: FormData) {
+        const newFormData = new FormData();
+        newFormData.append('jobId', jobId);
+
+        for (let [key, value] of images.entries()) {
+            if (key !== 'jobId') {
+                newFormData.append(key, value);
+            }
+        }
+
+        const response = auth.authorizedRequest(`${config.imagesUrl}/image`, "POST",{
+            data: newFormData
+        });
+
+        return response;
+    }
+
+    async function getImages(jobId: string){
+        return await auth.authorizedRequest(`${config.imagesUrl}/image/${jobId}`, "GET");
+    }
+
     // Fetch jobs based on a specific role
     async function getMyJobs(role: string) {
         return auth.authorizedRequest(`${baseUrl}/${role.toLowerCase()}`, "GET");
     }
 
-    return { isLoading, getAllJobs, postJob, getMyJobs };
+    return { isLoading, getAllJobs, postJob, getMyJobs,postImages,getImages };
 });

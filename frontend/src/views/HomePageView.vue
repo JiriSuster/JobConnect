@@ -144,7 +144,6 @@
 import {ref, computed, onMounted, watch} from 'vue';
 import config from "@/config";
 import {useAuth} from "@/composables/useAuth";
-import type {Job} from "@/model/Job";
 import {useJobServiceStore} from "@/stores/job.store";
 
 const isAdvancedForm = ref(false);
@@ -191,7 +190,7 @@ const selectedCategoryIds = computed(() => {
 
 const jobService = useJobServiceStore()
 
-const submitJob = () => {
+const submitJob = async () => {
   const jobData = {
     _id: undefined,
     state: "waiting",
@@ -201,13 +200,32 @@ const submitJob = () => {
     description: jobDescription.value,
     categories: selectedCategory.value,
     subcategories: selectedSubcategories.value || undefined,
-    images: uploadedImages.value || undefined,
+    images: undefined,
     budget: budget.value || undefined,
   };
-  jobService.postJob(jobData)
-  console.log('Submitted Job:', jobData);
-};
 
+  try {
+    const jobResponse = await jobService.postJob(jobData);
+    console.log('Submitted Job:', jobResponse);
+
+    const jobId = jobResponse._id;
+
+    const images = uploadedImages.value;
+
+    if (images && images.length > 0) {
+      const formData = new FormData();
+      images.forEach((image) => {
+        formData.append('photos', image);
+      });
+
+      const imageResponse = await jobService.postImages(jobId, formData);
+      console.log('Uploaded Images:', imageResponse);
+    }
+
+  } catch (error) {
+    console.error('Error submitting job or uploading images:', error);
+  }
+};
 
 
 

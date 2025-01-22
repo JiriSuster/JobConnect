@@ -3,8 +3,13 @@ frontend/.idea
 job-control/node_modules
 job-control/.idea
 job-control/.DS_Store
-job-control/src/middleware/logs
+job-control/logs
 chat/node_modules
 chat/.idea
 chat/.DS_Store
 chat/src/middleware/logs
+images/node_modules
+images/.idea
+images/.DS_Store
+images/logs
+images/uploads

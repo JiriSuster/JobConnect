@@ -1,6 +1,7 @@
 import * as process from "node:process";
 
 export default {
+    imagesUrl: import.meta.env.VITE_IMAGES_URL || 'http://localhost:3002',
     chatBackend: import.meta.env.VITE_CHAT_URL || 'http://localhost:3001',
     backendUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000',
     keycloak: {

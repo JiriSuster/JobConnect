@@ -8,7 +8,7 @@ export const loggingService = function (req, res, next) {
     }
 
     const userEmail = user.email;
-    const logFilePath = path.join(__dirname,'..','..', 'logs', `${userEmail}.log`);
+    const logFilePath = path.join(__dirname, '..','..', 'logs', `${userEmail}.log`);
     const startTime = Date.now();
 
     try {

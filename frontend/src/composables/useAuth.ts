@@ -163,7 +163,6 @@ export function useAuth() {
     const unauthorizedRequest = async (endpoint: string, method: string, options = {}) => {
         const response = await axios({
             url: `${endpoint}`,
-            headers: {},
             method: method,
             ...options,
         });

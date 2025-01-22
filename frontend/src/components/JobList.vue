@@ -23,7 +23,6 @@
           <v-spacer/>
         </v-card-title>
         <v-card-text>
-          <div v-if="selectedJob?._id"><strong>ID:</strong> {{ selectedJob?._id }}</div>
           <div v-if="selectedJob?.title"><strong>Title:</strong> {{ selectedJob?.title }}</div>
           <div v-if="selectedJob?.customerEmail"><strong>Customer email:</strong> {{ selectedJob?.customerEmail }}</div>
           <div v-if="selectedJob?.companyEmail"><strong>Assigned company email:</strong> {{ selectedJob?.companyEmail }}</div>
@@ -45,6 +44,26 @@
             </v-chip-group>
           </div>
 
+          <!-- Display Images -->
+          <div v-if="images.length">
+            <strong>Job Images:</strong>
+            <v-row>
+              <v-col
+                  v-for="(image, index) in images"
+                  :key="index"
+                  cols="12"
+                  sm="6"
+                  md="4"
+              >
+                <v-img
+                    :src="image"
+                    aspect-ratio="1"
+                    class="grey lighten-2"
+                ></v-img>
+              </v-col>
+            </v-row>
+          </div>
+
           <v-btn v-if="canBeAssigned" @click="assignJob(selectedJob?._id ?? '')">
             ASSIGN
           </v-btn>
@@ -53,26 +72,26 @@
           </v-btn>
 
           <div v-if="canOpenChat">
-          <div class="chat-container mt-4">
-            <h4>Chat</h4>
-            <div class="chat-messages" v-if="chatMessages.length">
-              <div v-for="(msg, index) in chatMessages" :key="index" class="chat-message">
-                <strong>{{ msg.sender }}:</strong> {{ msg.message }}
+            <div class="chat-container mt-4">
+              <h4>Chat</h4>
+              <div class="chat-messages" v-if="chatMessages.length">
+                <div v-for="(msg, index) in chatMessages" :key="index" class="chat-message">
+                  <strong>{{ msg.sender }}:</strong> {{ msg.message }}
+                </div>
               </div>
+              <div v-else>No messages yet.</div>
             </div>
-            <div v-else>No messages yet.</div>
-          </div>
 
-          <!-- Chat Input -->
-          <v-text-field
-              v-model="currentMessage"
-              label="Type a message..."
-              @keyup.enter="sendMessage"
-              class="mt-2"
-          ></v-text-field>
-          <v-btn color="primary" @click="sendMessage">
-            Send
-          </v-btn>
+            <!-- Chat Input -->
+            <v-text-field
+                v-model="currentMessage"
+                label="Type a message..."
+                @keyup.enter="sendMessage"
+                class="mt-2"
+            ></v-text-field>
+            <v-btn color="primary" @click="sendMessage">
+              Send
+            </v-btn>
           </div>
         </v-card-text>
         <v-card-actions>
@@ -92,6 +111,7 @@ import type { Job } from "@/model/Job";
 import { useAuth } from "@/composables/useAuth";
 import config from "@/config";
 import {useChatService} from "@/composables/useChatService";
+import {useJobServiceStore} from "@/stores/job.store";
 
 const props = defineProps({
   jobs: {
@@ -121,29 +141,37 @@ const isJobDialogOpen = ref(false);
 const selectedJob = ref<Job | null>(null);
 const auth = useAuth();
 const chatService = useChatService();
-
+const images = ref<string[]>([]);
 const chatMessages = ref<{ sender: string; message: string }[]>([]);
 const currentMessage = ref("");
-
-const viewJobDetails = (job: Job) => {
+const jobService = useJobServiceStore()
+const viewJobDetails = async (job: Job) => {
   selectedJob.value = job;
+  if (selectedJob.value?._id) {
+    await loadImages(selectedJob.value._id);
+  }
   isJobDialogOpen.value = true;
 
   if (selectedJob.value?._id) {
-    if(props.canOpenChat) {
+    if (props.canOpenChat) {
       chatService.init();
       chatService.joinRoom(selectedJob.value._id);
     }
     chatService.onMessage((data) => {
-      if(chatService.getClientId() == data.sender) {
+      if (chatService.getClientId() == data.sender) {
         data.sender = "ME"
-      }else {
+      } else {
         data.sender = auth.getUserRoles()[0] == "CUSTOMER" ? "COMPANY" : "CUSTOMER"
       }
       chatMessages.value.push(data);
     });
   }
 };
+
+const loadImages = async (id: string) => {
+  let imagesRemote = await jobService.getImages(id);
+  images.value = imagesRemote
+}
 
 const assignJob = (id: string) => {
   if (id.length === 24) {
