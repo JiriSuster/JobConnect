@@ -11,7 +11,8 @@ export const categoryService = {
     },
     async getSubcategories(data: CategoryDto) {
         return Subcategory.find({
-            categories: { $all: data.categories }
+            categories: { $all: data.categories },
+            $expr: { $eq: [ { $size: "$categories" }, data.categories.length ] }
         });
     }
 

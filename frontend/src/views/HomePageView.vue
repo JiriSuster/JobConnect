@@ -38,6 +38,16 @@
                   clearable
               />
             </template>
+            <template #append-item>
+              <v-list-item
+                  v-if="showAddCategory"
+                  @click="addCustomCategory"
+                  class="add-new-item"
+              >
+                <v-icon left>mdi-plus</v-icon>
+                Add "{{ categorySearch }}"
+              </v-list-item>
+            </template>
           </v-select>
           <v-textarea
               v-model="jobDescription"
@@ -77,7 +87,18 @@
                   clearable
               />
             </template>
+            <template #append-item>
+              <v-list-item
+                  v-if="showAddCategory"
+                  @click="addCustomCategory"
+                  class="add-new-item"
+              >
+                <v-icon left>mdi-plus</v-icon>
+                Add "{{ categorySearch }}"
+              </v-list-item>
+            </template>
           </v-select>
+
           <v-select
               v-if="selectedCategory.length"
               v-model="selectedSubcategories"
@@ -97,6 +118,16 @@
                   outlined
                   clearable
               />
+            </template>
+            <template #append-item>
+              <v-list-item
+                  v-if="showAddSubcategory"
+                  @click="addCustomSubcategory"
+                  class="add-new-item"
+              >
+                <v-icon left>mdi-plus</v-icon>
+                Add "{{ subcategorySearch }}"
+              </v-list-item>
             </template>
           </v-select>
 
@@ -124,7 +155,7 @@
               dense
               type="number"
               @input="budget = $event.target.value ? Number($event.target.value) : undefined"
-          /> <!-- @input for converting to number -->
+          />
         </template>
       </v-card-text>
       <v-card-actions>
@@ -140,24 +171,51 @@
 </template>
 
 <script lang="ts" setup>
-
-import {ref, computed, onMounted, watch} from 'vue';
-import config from "@/config";
-import {useAuth} from "@/composables/useAuth";
-import {useJobServiceStore} from "@/stores/job.store";
-import {useCategoryService} from "@/stores/category.store";
+import { ref, computed, onMounted, watch } from 'vue';
+import { useAuth } from "@/composables/useAuth";
+import { useJobServiceStore } from "@/stores/job.store";
+import { useCategoryService } from "@/stores/category.store";
 
 const isAdvancedForm = ref(false);
 const jobTitle = ref('');
 const jobDescription = ref('');
 const selectedCategory = ref<string[]>([]);
-const selectedSubcategories = ref<string[] | undefined>(undefined);
-const uploadedImages = ref<File[] | undefined>(undefined);
-const budget = ref<number | undefined>(undefined);
+const selectedSubcategories = ref<string[]>([]);
+const uploadedImages = ref<File[]>([]);
+const budget = ref<number>();
 const categories = ref<{ _id: string; name: string }[]>([]);
 const subcategories = ref<Record<string, string[]>>({});
 const categorySearch = ref('');
 const subcategorySearch = ref('');
+
+const showAddCategory = computed(() => {
+  const search = categorySearch.value.trim().toLowerCase();
+  return search !== '' &&
+      !categories.value.some(c => c.name.toLowerCase() === search);
+});
+
+function addCustomCategory() {
+  const newCategory = categorySearch.value.trim();
+  if (newCategory && !selectedCategory.value.includes(newCategory)) {
+    selectedCategory.value = [...selectedCategory.value, newCategory];
+  }
+  categorySearch.value = '';
+}
+
+
+const showAddSubcategory = computed(() => {
+  const search = subcategorySearch.value.trim().toLowerCase();
+  return search !== '' &&
+      !filteredSubcategories.value.some(s => s.toLowerCase() === search);
+});
+
+function addCustomSubcategory() {
+  const newSub = subcategorySearch.value.trim();
+  if (newSub && !selectedSubcategories.value.includes(newSub)) {
+    selectedSubcategories.value = [...selectedSubcategories.value, newSub];
+  }
+  subcategorySearch.value = '';
+}
 
 const filteredCategories = computed(() => {
   return categories.value
@@ -171,11 +229,12 @@ const filteredSubcategories = computed(() => {
   const selectedIds = selectedCategoryIds.value;
   if (!selectedIds.length) return [];
 
-  const allSubcategories = selectedIds
-      .map((id) => subcategories.value[id] || [])
-      .flat();
+  const uniqueSubcategories = new Set<string>();
+  selectedIds.forEach((id) => {
+    (subcategories.value[id] || []).forEach((sub) => uniqueSubcategories.add(sub));
+  });
 
-  return allSubcategories.filter((subcategory) =>
+  return Array.from(uniqueSubcategories).filter((subcategory) =>
       subcategory.toLowerCase().includes(subcategorySearch.value.toLowerCase())
   );
 });
@@ -201,9 +260,9 @@ const submitJob = async () => {
     title: jobTitle.value,
     description: jobDescription.value,
     categories: selectedCategory.value,
-    subcategories: selectedSubcategories.value || undefined,
+    subcategories: selectedSubcategories.value,
     images: undefined,
-    budget: budget.value || undefined,
+    budget: budget.value,
   };
 
   try {
@@ -212,11 +271,9 @@ const submitJob = async () => {
 
     const jobId = jobResponse._id;
 
-    const images = uploadedImages.value;
-
-    if (images && images.length > 0) {
+    if (uploadedImages.value.length > 0) {
       const formData = new FormData();
-      images.forEach((image) => {
+      uploadedImages.value.forEach((image) => {
         formData.append('photos', image);
       });
 
@@ -224,12 +281,23 @@ const submitJob = async () => {
       console.log('Uploaded Images:', imageResponse);
     }
 
+    resetForm();
+
   } catch (error) {
     console.error('Error submitting job or uploading images:', error);
   }
 };
 
-
+function resetForm() {
+  jobTitle.value = '';
+  jobDescription.value = '';
+  selectedCategory.value = [];
+  selectedSubcategories.value = [];
+  uploadedImages.value = [];
+  budget.value = undefined;
+  categorySearch.value = '';
+  subcategorySearch.value = '';
+}
 
 async function fetchCategories() {
   const response = await categoryService.getCategories();
