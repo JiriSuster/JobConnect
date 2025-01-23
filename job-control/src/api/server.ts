@@ -7,7 +7,11 @@ import { JobController } from "./controllers/job/job.controller";
 import { loggingService } from "../middleware/logging.middleware";
 import {CategoryController} from "./controllers/category/category.controller";
 const ExpresOAuthServer = require('@node-oauth/express-oauth-server');
+import YAML from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
+const path = require('path');
 
+const openapiSpec = YAML.load(path.join(__dirname, 'openapi.yaml'));
 export const server = express()
 
 // Allow CORS for process.env.CORS_ORIGIN
@@ -22,7 +26,7 @@ const auth = new ExpresOAuthServer({ model: oAuthModel });
 // Middleware to parse JSON and URL-encoded data
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
-
+server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
 // Security: Authentication middleware
 server.use(auth.authenticate()); // Ensure authentication happens first
 

@@ -24,8 +24,10 @@
     "mongoose": "8.7.1",
     "reflect-metadata": "^0.2.2",
     "supertest": "^7.0.0",
+    "swagger-ui-express": "^5.0.1",
     "vite-node": "^2.1.1",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.1",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

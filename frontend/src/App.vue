@@ -2,6 +2,7 @@
 import { RouterLink, RouterView } from 'vue-router'
 import {useAuth} from "@/composables/useAuth";
 import {computed, onMounted, ref} from "vue";
+import config from "@/config";
 
 let loading = ref(true)
 
@@ -15,6 +16,7 @@ onMounted(async () => {
 const filteredLinks = computed(() => {
   return [
     { to: '/', title: 'Home', show: true },
+    { href: `${config.backendUrl}/api-docs`, title: 'API', show: true }, // Changed to 'href'
     {
       to: '/add',
       title: 'New Job',
@@ -44,13 +46,14 @@ const filteredLinks = computed(() => {
       <nav class="d-flex align-center">
         <v-btn
             v-for="link in filteredLinks"
-            :key="link.to"
-            :to="link.to"
-            variant="text"
-            class="mx-1"
-            exact
+            :key="link.to || link.href"
+        :to="link.to"
+        :href="link.href"
+        variant="text"
+        class="mx-1"
+        exact
         >
-          {{ link.title }}
+        {{ link.title }}
         </v-btn>
       </nav>
 
