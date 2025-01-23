@@ -26,12 +26,12 @@ export const jobsService = {
     },
 
     async delete(id: string, email: string) {
-        const job = this.getById(id)
-        if(job.email == email){
+        const job = await Job.findById(id)
+        if(job.customerEmail == email){
             return Job.findByIdAndDelete(id);
         }
         else{
-            throw new Error(`Email: ${email} does not match the job owner's email.`);
+            console.error(`Email: ${email} does not match the job owner's ${job.customerEmail} email.`);
         }
     },
 
@@ -43,7 +43,7 @@ export const jobsService = {
             await job.save();
             return job;
         } else {
-            throw new Error(`Company email is already assigned to ${job.companyEmail}`);
+            console.error(`Company email is already assigned to ${job.companyEmail}`);
         }
     },
 
@@ -56,7 +56,7 @@ export const jobsService = {
             return job;
         }
         else {
-            throw new Error(`The provided email: ${email} does not match the company's assigned email: ${job.companyEmail}`);
+            console.error(`The provided email: ${email} does not match the company's assigned email: ${job.companyEmail}`);
         }
     },
 
@@ -71,7 +71,7 @@ export const jobsService = {
     async search(data: SearchDto) {
         try {
             if (!data.fields || data.fields.length === 0) {
-                throw new Error("No fields provided for search.");
+                console.error("No fields provided for search.");
             }
 
             const searchConditions = {
