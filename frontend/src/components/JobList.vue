@@ -12,9 +12,31 @@
           <v-btn color="primary" @click="viewJobDetails(job)">
             View Details
           </v-btn>
+          <v-btn
+              v-if="auth.getUserEmail() == job.customerEmail"
+              color="error"
+              @click="confirmDelete(job)"
+          >
+            Delete
+          </v-btn>
         </v-card-actions>
       </v-card>
     </div>
+
+    <v-dialog v-model="deleteDialogVisible" max-width="500px">
+      <v-card>
+        <v-card-title class="text-h5">Delete Job?</v-card-title>
+        <v-card-text>
+          Are you sure you want to permanently delete this job? This action cannot be undone.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="deleteDialogVisible = false">Cancel</v-btn>
+          <v-btn color="error" @click="handleDelete">Delete</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <v-dialog v-model="isJobDialogOpen" max-width="600px">
       <v-card>
@@ -25,10 +47,13 @@
         <v-card-text>
           <div v-if="selectedJob?.title"><strong>Title:</strong> {{ selectedJob?.title }}</div>
           <div v-if="selectedJob?.customerEmail"><strong>Customer email:</strong> {{ selectedJob?.customerEmail }}</div>
-          <div v-if="selectedJob?.companyEmail"><strong>Assigned company email:</strong> {{ selectedJob?.companyEmail }}</div>
+          <div v-if="selectedJob?.companyEmail"><strong>Assigned company email:</strong> {{ selectedJob?.companyEmail }}
+          </div>
           <div v-if="selectedJob?.description"><strong>Description:</strong> {{ selectedJob?.description }}</div>
           <div v-if="selectedJob?.categories"><strong>Category:</strong> {{ selectedJob?.categories.join(', ') }}</div>
-          <div v-if="selectedJob?.subcategories"><strong>Subcategories:</strong> {{ selectedJob?.subcategories.join(', ') }}</div>
+          <div v-if="selectedJob?.subcategories"><strong>Subcategories:</strong>
+            {{ selectedJob?.subcategories.join(', ') }}
+          </div>
           <div v-if="selectedJob?.budget"><strong>Budget:</strong> ${{ selectedJob?.budget }}</div>
           <div v-if="selectedJob?.images && selectedJob.images.length">
           </div>
@@ -41,10 +66,10 @@
                   v-for="(image, index) in images"
                   :key="index"
                   cols="12"
-                  sm="6"
                   md="4"
+                  sm="6"
               >
-                <a :href="image" target="_blank" rel="noopener noreferrer">
+                <a :href="image" rel="noopener noreferrer" target="_blank">
                   <v-img
                       :src="image"
                       aspect-ratio="1"
@@ -65,7 +90,7 @@
           <div v-if="canOpenChat">
             <div class="chat-container mt-4">
               <h4>Chat</h4>
-              <div class="chat-messages" v-if="chatMessages.length">
+              <div v-if="chatMessages.length" class="chat-messages">
                 <div v-for="(msg, index) in chatMessages" :key="index" class="chat-message">
                   <strong>{{ msg.sender }}:</strong> {{ msg.message }}
                 </div>
@@ -76,9 +101,9 @@
             <!-- Chat Input -->
             <v-text-field
                 v-model="currentMessage"
+                class="mt-2"
                 label="Type a message..."
                 @keyup.enter="sendMessage"
-                class="mt-2"
             ></v-text-field>
             <v-btn color="primary" @click="sendMessage">
               Send
@@ -96,11 +121,10 @@
 </template>
 
 
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from "vue";
-import type { Job } from "@/model/Job";
-import { useAuth } from "@/composables/useAuth";
-import config from "@/config";
+<script lang="ts" setup>
+import {onUnmounted, ref, watch} from "vue";
+import type {Job} from "@/model/Job";
+import {useAuth} from "@/composables/useAuth";
 import {useChatService} from "@/composables/useChatService";
 import {useJobServiceStore} from "@/stores/job.store";
 
@@ -127,7 +151,25 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["refetch-jobs"]);
+const deleteDialogVisible = ref(false);
+const jobToDelete = ref<Job | null>(null);
 
+const confirmDelete = (job: Job) => {
+  jobToDelete.value = job;
+  deleteDialogVisible.value = true;
+};
+
+const handleDelete = () => {
+  if (jobToDelete.value?._id) {
+    deleteJob(jobToDelete.value._id);
+    deleteDialogVisible.value = false;
+  }
+};
+
+const deleteJob = async (id: string) => {
+  await jobService.deleteJob(id);
+  emit("refetch-jobs");
+}
 const isJobDialogOpen = ref(false);
 const selectedJob = ref<Job | null>(null);
 const auth = useAuth();
@@ -163,22 +205,23 @@ const loadImages = async (id: string) => {
   try {
     let imagesRemote = await jobService.getImages(id);
     images.value = imagesRemote;
-  }catch(err) {
+  } catch (err) {
     console.log("No images found");
   }
 }
 
-const assignJob = (id: string) => {
+const assignJob = async (id: string) => {
   if (id.length === 24) {
-    jobService.assignJob(id);
+    await jobService.assignJob(id);
     emit("refetch-jobs");
     isJobDialogOpen.value = false;
   }
 };
 
-const unassignJob = (id: string) => {
+
+const unassignJob = async (id: string) => {
   if (id.length === 24) {
-    jobService.unassignJob(id);
+    await jobService.unassignJob(id);
     emit("refetch-jobs");
     isJobDialogOpen.value = false;
   }
@@ -193,7 +236,7 @@ const sendMessage = () => {
 
 
 onUnmounted(() => {
-  if(props.canOpenChat) {
+  if (props.canOpenChat) {
     chatService.disconnect();
   }
 });

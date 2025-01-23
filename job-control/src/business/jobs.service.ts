@@ -25,8 +25,14 @@ export const jobsService = {
         return Job.findByIdAndUpdate(id, data, {new: true});
     },
 
-    async delete(id: string) {
-        return Job.findByIdAndDelete(id);
+    async delete(id: string, email: string) {
+        const job = this.getById(id)
+        if(job.email == email){
+            return Job.findByIdAndDelete(id);
+        }
+        else{
+            throw new Error(`Email: ${email} does not match the job owner's email.`);
+        }
     },
 
     async assignCompany(jobId: string, email: string) {

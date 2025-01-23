@@ -32,6 +32,10 @@ export const useJobServiceStore = defineStore('job', () => {
 
     }
 
+    async function deleteJob(id: string) {
+        return await auth.authorizedRequest(`${config.backendUrl}/jobs/${id}`, "DELETE");
+    }
+
     // Post images to job
     async function postImages(jobId: string, images: FormData) {
         const newFormData = new FormData();
@@ -60,5 +64,5 @@ export const useJobServiceStore = defineStore('job', () => {
         return auth.authorizedRequest(`${baseUrl}/${role.toLowerCase()}`, "GET");
     }
 
-    return { isLoading, getAllJobs, postJob, getMyJobs,postImages,getImages,assignJob,unassignJob,search };
+    return { isLoading, getAllJobs, postJob, getMyJobs,postImages,getImages,assignJob,unassignJob,search,deleteJob };
 });

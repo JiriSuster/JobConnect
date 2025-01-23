@@ -51,8 +51,9 @@ export class JobController {
     }
 
     async delete(req: Request, res: Response) {
+        const email = res.locals.oauth?.token?.user.email
         const { id } = await validateParams(req, IdParam)
-        await jobsService.delete(id)
+        await jobsService.delete(id,email)
         res.status(204).send()
     }
 
