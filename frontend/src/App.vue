@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 import {useAuth} from "@/composables/useAuth";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 
 let loading = ref(true)
 
@@ -12,93 +11,73 @@ onMounted(async () => {
   await auth.init()
   loading.value = false
 })
+
+const filteredLinks = computed(() => {
+  return [
+    { to: '/', title: 'Home', show: true },
+    {
+      to: '/add',
+      title: 'New Job',
+      show: auth.getUserRoles()[0] === 'CUSTOMER'
+    },
+    {
+      to: '/myjobs',
+      title: 'My Jobs',
+      show: auth.getUserRoles().length > 0
+    },
+    {
+      to: '/alljobs',
+      title: 'All Jobs',
+      show: auth.getUserRoles()[0] === 'COMPANY'
+    }
+  ].filter(link => link.show);
+});
 </script>
 
 <template>
-  <div v-if="loading">Loading...</div>
-  <div v-else>
-    <header>
-      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <v-app>
+    <v-app-bar app flat color="background">
+      <v-toolbar-title class="text-h6">Job Platform</v-toolbar-title>
 
-      <div class="wrapper">
-        <HelloWorld msg="You did it!" />
+      <v-spacer></v-spacer>
 
-        <p v-if="auth.state.authenticated">Welcome, {{ auth.getUsername() }}! {{ auth.getUserRoles()[0] }}  {{ auth.getUserEmail() }}</p>
-        <button v-if="auth.state.authenticated" @click="auth.logout()">Log out</button>
-        <button v-else @click="auth.login()">Log in</button>
+      <nav class="d-flex align-center">
+        <v-btn
+            v-for="link in filteredLinks"
+            :key="link.to"
+            :to="link.to"
+            variant="text"
+            class="mx-1"
+            exact
+        >
+          {{ link.title }}
+        </v-btn>
+      </nav>
 
-        <nav>
-          <RouterLink to="/">Home</RouterLink>
-          <RouterLink to="/myjobs">My jobs</RouterLink>
-          <RouterLink v-if="auth.getUserRoles()[0] == 'COMPANY'" to="/alljobs">All jobs</RouterLink>
-        </nav>
+      <v-spacer></v-spacer>
+
+      <div class="d-flex align-center">
+        <v-chip v-if="auth.state.authenticated" variant="outlined" class="mr-2">
+          {{ auth.getUsername() }} ({{ auth.getUserRoles()[0] }})
+        </v-chip>
+        <v-btn
+            :prepend-icon="auth.state.authenticated ? 'mdi-logout' : 'mdi-login'"
+            variant="flat"
+            @click="auth.state.authenticated ? auth.logout() : auth.login()"
+        >
+          {{ auth.state.authenticated ? 'Logout' : 'Login' }}
+        </v-btn>
       </div>
-    </header>
+    </v-app-bar>
 
-    <RouterView />
-  </div>
+    <v-main>
+      <v-container>
+        <router-view v-if="!loading" />
+        <v-progress-circular v-else indeterminate></v-progress-circular>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
 </style>

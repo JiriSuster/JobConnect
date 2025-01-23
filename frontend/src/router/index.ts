@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginCallbackView from '../views/LoginCallbackView.vue'
-import HomePageView from "@/views/HomePageView.vue";
-import ListOfMyJobs from "@/views/ListOfMyJobs.vue";
-import ListOfAllJobs from "@/views/ListOfAllJobs.vue";
+import AddJobView from "@/views/AddJobView.vue";
+import ListOfMyJobsView from "@/views/ListOfMyJobsView.vue";
+import ListOfAllJobsView from "@/views/ListOfAllJobsView.vue";
+import HomeView from "@/views/HomeView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,17 +11,22 @@ const router = createRouter({
     {
       path: '/',
       name: 'index',
-      component: HomePageView,
+      component: HomeView,
+    },
+    {
+      path: '/add',
+      name: 'addjob',
+      component: AddJobView,
     },
     {
       path: '/myjobs',
       name: 'myjobs',
-      component: ListOfMyJobs,
+      component: ListOfMyJobsView,
     },
     {
       path: '/alljobs',
       name: 'alljobs',
-      component: ListOfAllJobs,
+      component: ListOfAllJobsView,
     },
     {
       path: '/about',
