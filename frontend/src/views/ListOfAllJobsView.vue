@@ -3,14 +3,12 @@ import { onMounted, ref } from "vue";
 import type { Job } from "@/model/Job";
 import JobList from "@/components/JobList.vue";
 import { useJobServiceStore } from "@/stores/job.store";
-import config from "@/config";
-import { useAuth } from "@/composables/useAuth";
+import * as sea from "node:sea";
 
-const auth = useAuth();
 const jobs = ref<Array<Job>>([]);
 const searchText = ref("");
 const isLoading = ref(false);
-
+const errorMessage = ref("");
 const selectedFields = ref<Array<string>>(["title", "description"]);
 
 const availableFields = [
@@ -35,9 +33,26 @@ async function fetchJobs() {
 
 async function search() {
   isLoading.value = true;
-  const response = await store.search(searchText.value,selectedFields.value);
-  jobs.value = response;
-  isLoading.value = false;
+  errorMessage.value = "";
+  console.log(searchText.value.trim().length);
+  try {
+    if(searchText.value.trim().length == 0) {
+      const response = await store.getAllJobs();
+      jobs.value = response;
+      return;
+    }
+    const response = await store.search(searchText.value, selectedFields.value);
+    jobs.value = response;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      errorMessage.value = "Your search didn't match any jobs.";
+      jobs.value = [];
+    } else {
+      errorMessage.value = "An error occurred during the search.";
+    }
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
 
@@ -86,6 +101,18 @@ async function search() {
     </v-row>
 
     <v-divider class="my-4"></v-divider>
+
+    <v-alert
+        v-if="errorMessage"
+        type="info"
+        variant="tonal"
+        closable
+        @click:close="errorMessage = ''"
+        class="mb-4"
+    >
+      {{ errorMessage }}
+    </v-alert>
+
 
     <JobList
         :jobs="jobs"

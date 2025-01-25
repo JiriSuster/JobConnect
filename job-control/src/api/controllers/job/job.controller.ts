@@ -74,19 +74,34 @@ export class JobController {
     async getByCustomer(req: Request, res: Response) {
         const email = res.locals.oauth?.token?.user.email
         const jobs = await jobsService.getJobByCustomer(email)
-        res.status(200).send(jobs)
+        if(jobs.length === 0){
+            res.status(404).json({error: 'Not found'})
+        }
+        else {
+            res.status(200).send(jobs)
+        }
     }
 
     async getByCompany(req: Request, res: Response) {
         const email = res.locals.oauth?.token?.user.email
         const jobs = await jobsService.getJobByCompany(email)
-        res.status(200).send(jobs)
+        if(jobs.length === 0){
+            res.status(404).json({error: 'Not found'})
+        }
+        else {
+            res.status(200).send(jobs)
+        }
     }
 
     async search(req: Request, res: Response){
         const dto = await validateBody(req, SearchDto)
         const jobs = await jobsService.search(dto)
-        res.status(200).send(jobs)
+        if(jobs.length === 0){
+            res.status(404).json({error: 'Not found'})
+        }
+        else {
+            res.status(200).send(jobs)
+        }
     }
 
 

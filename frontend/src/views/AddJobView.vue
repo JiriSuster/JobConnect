@@ -10,158 +10,190 @@
         />
       </v-card-title>
       <v-card-text>
-        <template v-if="!isAdvancedForm">
-          <v-text-field
-              v-model="jobTitle"
-              label="Job Title"
-              placeholder="Enter the job title"
-              outlined
-              dense
-          />
-          <v-select
-              v-model="selectedCategory"
-              label="Job Category"
-              :items="filteredCategories"
-              multiple
-              chips
-              outlined
-              dense
-              clearable
-              :menu-props="{ contentClass: 'category-menu' }"
-          >
-            <template #prepend-item>
-              <v-text-field
-                  v-model="categorySearch"
-                  label="Search Category"
-                  dense
-                  outlined
-                  clearable
-              />
-            </template>
-            <template #append-item>
-              <v-list-item
-                  v-if="showAddCategory"
-                  @click="addCustomCategory"
-                  class="add-new-item"
-              >
-                <v-icon left>mdi-plus</v-icon>
-                Add "{{ categorySearch }}"
-              </v-list-item>
-            </template>
-          </v-select>
-          <v-textarea
-              v-model="jobDescription"
-              label="Job Description"
-              placeholder="Enter a detailed description of the job"
-              outlined
-              rows="4"
-              dense
-          />
-        </template>
+        <v-alert
+            v-model="submitSuccess"
+            type="success"
+            dismissible
+            class="mb-4"
+        >
+          Job submitted successfully!
+        </v-alert>
+        <v-alert
+            v-model="submitError"
+            type="error"
+            dismissible
+            class="mb-4"
+        >
+          Submission failed. Please check the form.
+        </v-alert>
 
-        <template v-else>
-          <v-text-field
-              v-model="jobTitle"
-              label="Job Title"
-              placeholder="Enter the job title"
-              outlined
-              dense
-          />
-          <v-select
-              v-model="selectedCategory"
-              label="Job Category"
-              :items="filteredCategories"
-              multiple
-              chips
-              outlined
-              dense
-              clearable
-              :menu-props="{ contentClass: 'category-menu' }"
-          >
-            <template #prepend-item>
-              <v-text-field
-                  v-model="categorySearch"
-                  label="Search Category"
-                  dense
-                  outlined
-                  clearable
-              />
-            </template>
-            <template #append-item>
-              <v-list-item
-                  v-if="showAddCategory"
-                  @click="addCustomCategory"
-                  class="add-new-item"
-              >
-                <v-icon left>mdi-plus</v-icon>
-                Add "{{ categorySearch }}"
-              </v-list-item>
-            </template>
-          </v-select>
+        <v-form ref="form" @submit.prevent="submitJob">
+          <template v-if="!isAdvancedForm">
+            <v-text-field
+                v-model="jobTitle"
+                label="Job Title"
+                placeholder="Enter the job title"
+                outlined
+                dense
+                :rules="titleRules"
+                required
+            />
+            <v-select
+                v-model="selectedCategory"
+                label="Job Category"
+                :items="filteredCategories"
+                multiple
+                chips
+                outlined
+                dense
+                clearable
+                :rules="categoryRules"
+                required
+                :menu-props="{ contentClass: 'category-menu' }"
+            >
+              <template #prepend-item>
+                <v-text-field
+                    v-model="categorySearch"
+                    label="Search Category"
+                    dense
+                    outlined
+                    clearable
+                />
+              </template>
+              <template #append-item>
+                <v-list-item
+                    v-if="showAddCategory"
+                    @click="addCustomCategory"
+                    class="add-new-item"
+                >
+                  <v-icon left>mdi-plus</v-icon>
+                  Add "{{ categorySearch }}"
+                </v-list-item>
+              </template>
+            </v-select>
+            <v-textarea
+                v-model="jobDescription"
+                label="Job Description"
+                placeholder="Enter a detailed description of the job"
+                outlined
+                rows="4"
+                dense
+                :rules="descriptionRules"
+                required
+            />
+          </template>
 
-          <v-select
-              v-if="selectedCategory.length"
-              v-model="selectedSubcategories"
-              label="Job Subcategory"
-              :items="filteredSubcategories"
-              multiple
-              chips
-              outlined
-              dense
-              clearable
-          >
-            <template #prepend-item>
-              <v-text-field
-                  v-model="subcategorySearch"
-                  label="Search Subcategory"
-                  dense
-                  outlined
-                  clearable
-              />
-            </template>
-            <template #append-item>
-              <v-list-item
-                  v-if="showAddSubcategory"
-                  @click="addCustomSubcategory"
-                  class="add-new-item"
-              >
-                <v-icon left>mdi-plus</v-icon>
-                Add "{{ subcategorySearch }}"
-              </v-list-item>
-            </template>
-          </v-select>
+          <template v-else>
+            <v-text-field
+                v-model="jobTitle"
+                label="Job Title"
+                placeholder="Enter the job title"
+                outlined
+                dense
+                :rules="titleRules"
+                required
+            />
+            <v-select
+                v-model="selectedCategory"
+                label="Job Category"
+                :items="filteredCategories"
+                multiple
+                chips
+                outlined
+                dense
+                clearable
+                :rules="categoryRules"
+                required
+                :menu-props="{ contentClass: 'category-menu' }"
+            >
+              <template #prepend-item>
+                <v-text-field
+                    v-model="categorySearch"
+                    label="Search Category"
+                    dense
+                    outlined
+                    clearable
+                />
+              </template>
+              <template #append-item>
+                <v-list-item
+                    v-if="showAddCategory"
+                    @click="addCustomCategory"
+                    class="add-new-item"
+                >
+                  <v-icon left>mdi-plus</v-icon>
+                  Add "{{ categorySearch }}"
+                </v-list-item>
+              </template>
+            </v-select>
 
-          <v-textarea
-              v-model="jobDescription"
-              label="Job Description"
-              placeholder="Enter a detailed description of the job"
-              outlined
-              rows="4"
-              dense
-          />
-          <v-file-input
-              v-model="uploadedImages"
-              label="Upload Images"
-              accept="image/*"
-              outlined
-              dense
-              multiple
-          />
-          <v-text-field
-              v-model="budget"
-              label="Budget ($)"
-              placeholder="Enter the budget"
-              outlined
-              dense
-              type="number"
-              @input="budget = $event.target.value ? Number($event.target.value) : undefined"
-          />
-        </template>
+            <v-select
+                v-if="selectedCategory.length"
+                v-model="selectedSubcategories"
+                label="Job Subcategory"
+                :items="filteredSubcategories"
+                multiple
+                chips
+                outlined
+                dense
+                clearable
+            >
+              <template #prepend-item>
+                <v-text-field
+                    v-model="subcategorySearch"
+                    label="Search Subcategory"
+                    dense
+                    outlined
+                    clearable
+                />
+              </template>
+              <template #append-item>
+                <v-list-item
+                    v-if="showAddSubcategory"
+                    @click="addCustomSubcategory"
+                    class="add-new-item"
+                >
+                  <v-icon left>mdi-plus</v-icon>
+                  Add "{{ subcategorySearch }}"
+                </v-list-item>
+              </template>
+            </v-select>
+
+            <v-textarea
+                v-model="jobDescription"
+                label="Job Description"
+                placeholder="Enter a detailed description of the job"
+                outlined
+                rows="4"
+                dense
+                :rules="descriptionRules"
+                required
+            />
+            <v-file-input
+                v-model="uploadedImages"
+                label="Upload Images"
+                accept="image/*"
+                outlined
+                dense
+                multiple
+            />
+            <v-text-field
+                v-model="budget"
+                label="Budget ($)"
+                placeholder="Enter the budget"
+                outlined
+                dense
+                type="number"
+                @input="budget = $event.target.value ? Number($event.target.value) : undefined"
+            />
+          </template>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-btn
             color="primary"
             @click="submitJob"
+            type="submit"
         >
           Submit Job
         </v-btn>
@@ -187,6 +219,23 @@ const categories = ref<{ _id: string; name: string }[]>([]);
 const subcategories = ref<Record<string, string[]>>({});
 const categorySearch = ref('');
 const subcategorySearch = ref('');
+const submitSuccess = ref(false);
+const submitError = ref(false);
+const form = ref();
+
+const titleRules = [
+  (v: string) => !!v || 'Title is required',
+  (v: string) => (v.length >= 5 && v.length <= 50) || 'Title must be between 5-50 characters',
+];
+
+const descriptionRules = [
+  (v: string) => !!v || 'Description is required',
+  (v: string) => (v.length >= 20 && v.length <= 5000) || 'Description must be between 20-5000 characters',
+];
+
+const categoryRules = [
+  (v: string[]) => v.length >= 1 || 'At least one category is required',
+];
 
 const showAddCategory = computed(() => {
   const search = categorySearch.value.trim().toLowerCase();
@@ -201,7 +250,6 @@ function addCustomCategory() {
   }
   categorySearch.value = '';
 }
-
 
 const showAddSubcategory = computed(() => {
   const search = subcategorySearch.value.trim().toLowerCase();
@@ -239,7 +287,6 @@ const filteredSubcategories = computed(() => {
   );
 });
 
-
 const selectedCategoryIds = computed(() => {
   return selectedCategory.value
       .map((name) =>
@@ -252,6 +299,11 @@ const jobService = useJobServiceStore()
 const categoryService = useCategoryService()
 
 const submitJob = async () => {
+  submitError.value = false;
+
+  const { valid } = await form.value.validate();
+  if (!valid) return;
+
   const jobData = {
     _id: undefined,
     state: "waiting",
@@ -260,35 +312,34 @@ const submitJob = async () => {
     title: jobTitle.value,
     description: jobDescription.value,
     categories: selectedCategory.value,
-    subcategories: selectedSubcategories.value,
+    subcategories: selectedSubcategories.value.length ? selectedSubcategories.value : undefined,
     images: undefined,
     budget: budget.value,
   };
 
   try {
     const jobResponse = await jobService.postJob(jobData);
-    console.log('Submitted Job:', jobResponse);
-
-    const jobId = jobResponse._id;
 
     if (uploadedImages.value.length > 0) {
       const formData = new FormData();
       uploadedImages.value.forEach((image) => {
         formData.append('photos', image);
       });
-
-      const imageResponse = await jobService.postImages(jobId, formData);
-      console.log('Uploaded Images:', imageResponse);
+      await jobService.postImages(jobResponse._id, formData);
     }
 
+    submitSuccess.value = true;
+    setTimeout(() => submitSuccess.value = false, 5000);
     resetForm();
-
   } catch (error) {
-    console.error('Error submitting job or uploading images:', error);
+    console.error('Submission error:', error);
+    submitError.value = true;
+    setTimeout(() => submitError.value = false, 5000);
   }
 };
 
 function resetForm() {
+  form.value.reset();
   jobTitle.value = '';
   jobDescription.value = '';
   selectedCategory.value = [];
@@ -307,12 +358,8 @@ async function fetchCategories() {
   }));
 }
 
-
 async function fetchSubcategories() {
   const response = await categoryService.getSubcategories(selectedCategoryIds.value);
-
-
-
   subcategories.value = response.reduce((acc: Record<string, string[]>, subcategory: { _id: string; name: string; categories: string[] }) => {
     subcategory.categories.forEach((categoryId) => {
       if (!acc[categoryId]) {
@@ -324,8 +371,7 @@ async function fetchSubcategories() {
   }, {});
 }
 
-
-onMounted(()=>{
+onMounted(() => {
   fetchCategories()
 })
 

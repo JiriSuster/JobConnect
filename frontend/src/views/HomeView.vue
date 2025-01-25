@@ -29,7 +29,7 @@ function handleClick() {
           JobConnect Platform
         </h1>
         <p class="text-h6 text-secondary">
-          Connecting Businesses with Skilled Professionals
+          Connecting Ordinary People with Skilled Professionals
         </p>
       </v-col>
     </v-row>

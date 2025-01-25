@@ -39,7 +39,7 @@ const filteredLinks = computed(() => {
 <template>
   <v-app>
     <v-app-bar app flat color="background">
-      <v-toolbar-title class="text-h6">Job Platform</v-toolbar-title>
+      <v-toolbar-title class="text-h6">JobConnect</v-toolbar-title>
 
       <v-spacer></v-spacer>
 

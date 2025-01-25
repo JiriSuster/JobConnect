@@ -22,11 +22,11 @@ export class JobDto {
     companyEmail: string;
 
     @IsNotEmpty()
-    @Length(3, 50)
+    @Length(5, 100)
     title: string;
 
     @IsNotEmpty()
-    @Length(3, 5000)
+    @Length(20, 5000)
     description: string;
 
     @IsArray()

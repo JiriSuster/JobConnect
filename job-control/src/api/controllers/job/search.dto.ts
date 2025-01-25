@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 
 export class SearchDto {
-    @Length(2, 50)
+    @Length(1, 20)
     @IsNotEmpty()
     text: string;
 

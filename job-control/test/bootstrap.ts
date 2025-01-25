@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import mongo from "../src/persistence/mongo";
 import {afterAll, beforeAll, beforeEach} from 'vitest'
-import {userService} from "../src/business/user.service";
 
 beforeAll(async () => {
     await mongo.connect()
@@ -13,7 +12,6 @@ beforeEach(async () => {
         const collection = collections[key];
         await collection.deleteMany();
     }
-    const users = await userService.searchByName("john")
 });
 
 afterAll(async () => {
