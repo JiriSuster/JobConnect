@@ -145,25 +145,25 @@ Additional containers include:
 ## Screenshots
 ### Customer
 
-![Screenshot8](Screenshots/main_page.png)
-![Screenshot0](Screenshots/customer_add_1.png)
-![Screenshot1](Screenshots/customer_add_2.png)
-![Screenshot2](Screenshots/customer_add_3.png)
-![Screenshot3](Screenshots/customer_add_4.png)
-![Screenshot4](Screenshots/customer_add_5.png)
-![Screenshot5](Screenshots/customer_add_6.png)
-![Screenshot6](Screenshots/customer_all_1.png)
-![Screenshot7](Screenshots/customer_all_2.png)
+![Screenshot8](screenshots/main_page.png)
+![Screenshot0](screenshots/customer_add_1.png)
+![Screenshot1](screenshots/customer_add_2.png)
+![Screenshot2](screenshots/customer_add_3.png)
+![Screenshot3](screenshots/customer_add_4.png)
+![Screenshot4](screenshots/customer_add_5.png)
+![Screenshot5](screenshots/customer_add_6.png)
+![Screenshot6](screenshots/customer_all_1.png)
+![Screenshot7](screenshots/customer_all_2.png)
 
 ### Company
 
-![Screenshot9](Screenshots/company_all_1.png)
-![Screenshot10](Screenshots/company_all_2.png)
-![Screenshot11](Screenshots/company_all_3.png)
-![Screenshot12](Screenshots/customer_all_2.png)
-![Screenshot13](Screenshots/customer_all_2.png)
-![Screenshot14](Screenshots/customer_all_2.png)
-![Screenshot15](Screenshots/customer_company_chat.png)
+![Screenshot9](screenshots/company_all_1.png)
+![Screenshot10](screenshots/company_all_2.png)
+![Screenshot11](screenshots/company_all_3.png)
+![Screenshot12](screenshots/customer_all_2.png)
+![Screenshot13](screenshots/customer_all_2.png)
+![Screenshot14](screenshots/customer_all_2.png)
+![Screenshot15](screenshots/customer_company_chat.png)
 
 ## License
 
