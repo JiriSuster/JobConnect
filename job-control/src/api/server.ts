@@ -28,13 +28,13 @@ server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
 // Security: Authentication middleware
+server.get('/', homepageController.homepage);
 server.use(auth.authenticate()); // Ensure authentication happens first
 
 // Use the loggingService middleware after authentication
 server.use(loggingService);
 
 // Homepage
-server.get('/', homepageController.homepage);
 
 // Job routes
 const jobController = new JobController();
