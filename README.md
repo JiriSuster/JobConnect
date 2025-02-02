@@ -160,9 +160,6 @@ Additional containers include:
 ![Screenshot9](screenshots/company_all_1.png)
 ![Screenshot10](screenshots/company_all_2.png)
 ![Screenshot11](screenshots/company_all_3.png)
-![Screenshot12](screenshots/customer_all_2.png)
-![Screenshot13](screenshots/customer_all_2.png)
-![Screenshot14](screenshots/customer_all_2.png)
 ![Screenshot15](screenshots/customer_company_chat.png)
 
 ## License
