@@ -1,7 +1,5 @@
 # JobConnect App
-
-A web application that connects ordinary people with skilled professionals. Built using a microservices architecture and containerized with Docker, this app brings together various services for job management, real-time chat, image handling, and secure user authentication.
-
+Final project for course *Web Applications: Backend*, taught at [PEF MENDELU](https://pef.mendelu.cz/), graded 37/40 points (due to lack of tests)
 ## Table of Contents
 
 - [Overview](#overview)
@@ -11,7 +9,6 @@ A web application that connects ordinary people with skilled professionals. Buil
 - [Getting Started](#getting-started)
 - [Usage](#usage)
 - [Screenshots](#screenshots)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Overview
