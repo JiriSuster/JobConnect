@@ -144,6 +144,9 @@ Additional containers include:
   - Click **Detail** to view job information (without chat) and assign the job using the **Assign** button.
   - Once assigned, the job will appear in the **My Jobs** tab, where you can view details and engage in chat with the customer.
 
+## Authors
+- [Jiří Daniel Šuster](https://www.linkedin.com/in/ji%C5%99%C3%AD-daniel-%C5%A1uster-7017b0306/)
+  
 ## Screenshots
 
 ### Customer
